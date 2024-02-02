@@ -29,13 +29,14 @@ public class AutomationServer {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    private AutomationServerEnum type;
-
     @NotBlank(message = "Missing mandatory field 'name'")
     private String name;
 
     @NotBlank(message = "Missing mandatory field 'url'")
     private String url;
+
+    private AutomationServerEnum type;
+    private String token;
 
     @JsonDeserialize(using = AutomationServerEnumDeserializer.class)
     public enum AutomationServerEnum {
@@ -63,7 +64,7 @@ public class AutomationServer {
             return AutomationServerEnum.values()[0];
         }
 
-        public static List<AutomationServerEnum> valid() {
+        public static List<AutomationServerEnum> validValues() {
             return Arrays.stream(AutomationServerEnum.values())
                     .filter(x -> !x.equals(UNSUPPORTED_AUTOMATION_SERVER))
                     .collect(Collectors.toUnmodifiableList());

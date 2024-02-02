@@ -37,18 +37,19 @@ public class AutomationServerController {
 
     @GetMapping("/q")
     public ResponseEntity<?> search(@RequestParam(required = false) final String name,
-                                              @RequestParam(required = false) final String type) {
-        if (StringUtils.isBlank(name) && StringUtils.isBlank(type)) {
-            return ResponseEntity.badRequest().body(new BadRequestErrorResponse("No search parameters provided"));
+                                    @RequestParam(required = false) final String type,
+                                    @RequestParam(required = false) final String url) {
+        if (StringUtils.isBlank(name) && StringUtils.isBlank(type) && StringUtils.isBlank(url)) {
+            return ResponseEntity.badRequest().body(new BadRequestErrorResponse("Search parameters missing"));
         }
-        return ResponseEntity.ok(service.search(name, type));
+        return ResponseEntity.ok(service.search(name, type, url));
     }
 
     @PostMapping
     public AutomationServer create(@RequestBody final AutomationServer server) {
         if (server.getType().equals(AutomationServer.AutomationServerEnum.UNSUPPORTED_AUTOMATION_SERVER)) {
             throw new UnsupportedAutomationServerException("Invalid automation server type provided, expecting one of possible types: "
-                    + AutomationServer.AutomationServerEnum.valid());
+                    + AutomationServer.AutomationServerEnum.validValues());
         }
         return service.create(server);
     }
