@@ -9,10 +9,10 @@ import org.springframework.web.client.RestTemplate;
 
 @EnableAutoConfiguration(exclude = {SecurityAutoConfiguration.class})
 @SpringBootApplication
-public class App {
+public class Application {
 
     public static void main(String[] args) {
-        SpringApplication.run(App.class, args);
+        SpringApplication.run(Application.class, args);
     }
 
     @Bean
