@@ -23,9 +23,8 @@ public class OrgService {
         return repository.findAll(pageable);
     }
 
-    public Org findById(final long id) {
-        return repository.findById(id)
-                .orElseThrow(() -> throwEx(id));
+    public Optional<Org> findById(final long id) {
+        return repository.findById(id);
     }
 
     public Optional<Org> findByName(final String name) {
@@ -34,14 +33,22 @@ public class OrgService {
 
     @Transactional
     public Org create(final Org org) {
+        log.info("Saving org " + org);
+        final Optional<Org> found = repository.findByName(org.getName());
+        found.ifPresent(s -> {
+            throw new DuplicateOrgException("Org with name " + s.getName() + " already exists");
+        });
         return repository.save(org);
     }
 
     @Transactional
     public void update(final Org org) {
+        log.info("Updating org " + org);
         repository.findById(org.getId()).ifPresentOrElse(
             x -> repository.save(org),
-            () -> throwEx(org.getId())
+            () -> {
+                throw new OrgNotFoundException("Org not found with id " + org.getId());
+            }
         );
     }
 
@@ -50,10 +57,6 @@ public class OrgService {
         log.info("Deleting org with id " + id);
         repository.deleteById(id);
         log.info("Org " + id + " deleted successfully");
-    }
-
-    private OrgNotFoundException throwEx(final Long id) {
-        throw new OrgNotFoundException("Org not found with id " + id);
     }
 
 }

@@ -29,12 +29,12 @@ public class OrgController {
     }
 
     @GetMapping("/{id}")
-    public Org find(@PathVariable final long id) {
+    public Optional<Org> find(@PathVariable final long id) {
         return service.findById(id);
     }
 
     @GetMapping("/q")
-    public  Optional<Org> findByName(@RequestParam final String name) {
+    public  Optional<Org> search(@RequestParam final String name) {
         return service.findByName(name);
     }
 
