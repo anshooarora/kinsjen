@@ -8,15 +8,22 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 import lombok.Data;
+import org.springframework.data.annotation.CreatedDate;
 
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.NotBlank;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -29,14 +36,21 @@ public class AutomationServer {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
+    @CreatedDate
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private Date createdAt = new Date();
+
     @NotBlank(message = "Missing mandatory field 'name'")
     private String name;
 
     @NotBlank(message = "Missing mandatory field 'url'")
     private String url;
 
-    private AutomationServerEnum type;
-    private String token;
+    private AutomationServerEnum type = AutomationServerEnum.JENKINS;
+
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JoinColumn(name = "automation_server_id", referencedColumnName = "id")
+    private List<AuthToken> authTokens;
 
     @JsonDeserialize(using = AutomationServerEnumDeserializer.class)
     public enum AutomationServerEnum {
