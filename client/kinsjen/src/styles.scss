@@ -1,1 +1,25 @@
-/* You can add global styles to this file, and also import other style files */
+@import 'assets/style.bundle.css';
+@import 'assets/bootstrap-icons.min.css';
+@import 'https://fonts.googleapis.com/css?family=Inter:300,400,500,600,700';
+
+body, html, app-root {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-size: 13px !important;
+    font-weight: 400;
+    font-family: Inter, Helvetica, sans-serif;
+}
+app-pipeline {
+    height: 90%;
+}
+.aside {
+    background-color: #fff;
+    min-width: 250px;
+}
+.ff-monospace {
+    font-family: monospace;
+    font-size: 90% !important;
+}
