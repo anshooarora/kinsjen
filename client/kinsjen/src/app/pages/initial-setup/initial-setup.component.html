@@ -1,0 +1,98 @@
+<div class="container">
+    <div class="row">
+        <div class="col-8 offset-2">
+            
+            <!-- org -->
+            <div class="card py-5" *ngIf="!orgs?.totalElements">
+                <div class="card-body text-center">
+                    <div class="mb-5">
+                        <i class="bi bi-houses fs-1 text-primary"></i>
+                    </div>
+                    <h3>Looks like it's your first time here</h3>
+                    <p>Start by adding an org. You can later add & associate pipelines and group them together.</p>
+                    <div class="col-4 offset-4 mt-10">
+                        <input type="text" class="form-control" placeholder="myorg" [(ngModel)]="org.name" (keyup.enter)="saveOrg()" />
+                        <button type="submit" class="btn btn-primary mt-4" [disabled]="!org.name" (click)="saveOrg()">Create {{ org.name }}</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- org ready msg -->
+            <div class="alert bg-success p-5 text-light" *ngIf="orgs?.totalElements && org.name">
+                <div class="d-flex flex-column pe-0 pe-sm-10">
+                    <h5 class="mb-2 text-light">Your first org, {{ org.name }} is ready!</h5>
+                </div>
+            </div>
+
+            <!-- automation-server -->
+            <div class="card py-5" *ngIf="orgs?.totalElements && !automationServerPage.totalElements">
+                <div class="card-body text-center">
+                    <div class="mb-5">
+                        <i class="bi bi-database-add fs-1 text-primary"></i>
+                    </div>
+                    <h3>Let's now add an automation server</h3>
+                    <p>You can add additional servers and auth tokens later</p>
+                    <p class="border-bottom"></p>
+
+                    <div class="row mb-4 mt-10 text-start">
+                        <div class="col-3">
+                            <div class="fw-semibold mt-2 mb-3">Automation Server</div>
+                        </div>
+                        <div class="col-9">
+                            <div class="row g-9">
+                                <div class="col-6">
+                                    <label class="btn btn-outline btn-outline-dashed btn-active-light-primary active d-flex text-start p-4">
+                                        <span class="form-check form-check-custom form-check-solid form-check-sm align-items-start mt-1">
+                                            <input class="form-check-input" type="radio" name="usage" value="1" checked="checked">
+                                        </span>
+                                        <span class="ms-5">
+                                            <span class="fw-bold mb-1 d-block">Jenkins</span>
+                                            <span class="fw-semibold fs-7 text-gray-600">An open source automation server to reliably build, test, and deploy software</span>
+                                        </span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mb-3 text-start">
+                        <div class="col-xl-3">
+                            <div class="fw-semibold mt-2 mb-3">Server Details</div>
+                        </div>
+                        <div class="col-9">
+                            <div class="input-group input-group-solid">
+                                <input type="text" class="form-control" [(ngModel)]="automationServer.name" placeholder="server-name" style="max-width: 30%;" />
+                                <span class="input-group-text"></span>
+                                <input type="text" class="form-control" [(ngModel)]="automationServer.url" placeholder="https://localhost/" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row text-start">
+                        <div class="col-xl-3">
+                            <div class="fw-semibold mt-2 mb-3">Authentication</div>
+                        </div>
+                        <div class="col-9">
+                            <div class="input-group input-group-solid">
+                                <input type="text" class="form-control" [(ngModel)]="authToken.name" placeholder="token-name" style="max-width: 30%;" />
+                                <span class="input-group-text"></span>
+                                <input type="text" class="form-control" [(ngModel)]="authToken.token" placeholder="token"/>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row text-end">
+                        <div class="col-xl-3"></div>
+                        <div class="col-xl-9">
+                            <button type="submit" class="btn btn-primary mt-4" 
+                                [disabled]="!enableAddPipelines()" (click)="saveAutomationServer()">Start adding pipelines</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- error -->
+            <div class="alert alert-danger bg-light-danger border border-danger border-dashed d-flex align-items-center p-5" *ngIf="error">
+                {{ error }}
+            </div>
+            
+        </div>
+    </div>
+</div>	
