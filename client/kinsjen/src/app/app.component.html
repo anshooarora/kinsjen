@@ -1,28 +1,28 @@
 <div class="wrapper d-flex flex-column flex-row-fluid mt-3">
-    <div class="header">
-        <div class="container d-flex align-items-center justify-content-between">
-            <div class="page-title d-flex flex-column align-items-start justify-content-center flex-wrap">
-                <h1 class="text-gray-900 fw-normal my-0 fs-2">{{ componentTitle }}</h1>
-                <ul class="breadcrumb breadcrumb-line text-muted fw-semibold fs-base my-1">
-                <li class="breadcrumb-item">
-                    <a routerLink="/">Home</a>
-                </li>
-                    <li class="breadcrumb-item" *ngFor="let breadcrumb of breadcrumbs">
-                        <a [routerLink]="['/', breadcrumb.url]" *ngIf="breadcrumb.url">{{ breadcrumb.name }}</a>
-                        <span *ngIf="!breadcrumb.url">{{ breadcrumb.name }}</span>
-                    </li>
-                </ul>
-            </div>
+  <div class="header">
+      <div class="container d-flex align-items-center justify-content-between">
+          <div class="page-title d-flex flex-column align-items-start justify-content-center flex-wrap">
+              <h1 class="text-gray-900 fw-normal my-0 fs-2">{{ componentTitle }}</h1>
+              <ul class="breadcrumb breadcrumb-line text-muted fw-semibold fs-base my-1">
+              <li class="breadcrumb-item">
+                  <a routerLink="/">Home</a>
+              </li>
+                  <li class="breadcrumb-item" *ngFor="let breadcrumb of breadcrumbs">
+                      <a [routerLink]="['/', breadcrumb.url]" *ngIf="breadcrumb.url">{{ breadcrumb.name }}</a>
+                      <span *ngIf="!breadcrumb.url">{{ breadcrumb.name }}</span>
+                  </li>
+              </ul>
+          </div>
 
-            <div class="d-flex">
-                <div class="d-flex ms-3">
-                    <a href="#" class="btn btn-outline btm-sm" tooltip="">
-                        Button
-                    </a>
-                </div>
-            </div>
-        </div>
-    </div>
-    <router-outlet></router-outlet>
-    <div class="footer py-10 d-flex flex-column"></div>
+          <div class="d-flex">
+              <div class="d-flex ms-3">
+                  <a href="#" class="btn btn-outline btm-sm" tooltip="">
+                      Button
+                  </a>
+              </div>
+          </div>
+      </div>
+  </div>
+  <router-outlet></router-outlet>
+  <div class="footer py-10 d-flex flex-column"></div>
 </div>        
