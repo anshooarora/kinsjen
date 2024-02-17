@@ -11,11 +11,11 @@ import { Org } from '../../model/org.model';
 import { OrgService } from '../../services/org.service';
 
 @Component({
-  selector: 'app-initial-setup',
-  templateUrl: './initial-setup.component.html',
-  styleUrl: './initial-setup.component.scss'
+  selector: 'app-start',
+  templateUrl: './start.component.html',
+  styleUrl: './start.component.scss'
 })
-export class InitialSetupComponent implements OnInit {
+export class StartComponent implements OnInit {
 
   private destroy$: Subject<any> = new Subject<any>();
   private readonly componentTitle: string = 'Start';
