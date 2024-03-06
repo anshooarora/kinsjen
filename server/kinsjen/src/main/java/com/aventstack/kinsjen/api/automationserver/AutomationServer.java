@@ -1,5 +1,6 @@
 package com.aventstack.kinsjen.api.automationserver;
 
+import com.aventstack.kinsjen.api.authtoken.AuthToken;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 import com.fasterxml.jackson.core.JsonParser;
