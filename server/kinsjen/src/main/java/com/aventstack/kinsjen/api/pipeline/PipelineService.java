@@ -1,6 +1,6 @@
 package com.aventstack.kinsjen.api.pipeline;
 
-import com.aventstack.kinsjen.api.automationserver.AutomationServer;
+import com.aventstack.kinsjen.api.jenkinsinstance.JenkinsInstance;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,7 +47,7 @@ public class PipelineService {
         final Pipeline pipeline = new Pipeline();
         pipeline.setOrg(org);
         pipeline.setName(name);
-        pipeline.setAutomationServer(AutomationServer.AutomationServerEnum.fromString(automationServer));
+        pipeline.setAutomationServer(JenkinsInstance.AutomationServerEnum.fromString(automationServer));
         pipeline.setUrl(url);
         Example<Pipeline> example = Example.of(pipeline, SEARCH_CONDITIONS);
         return repository.findAll(example);

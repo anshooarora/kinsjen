@@ -1,4 +1,4 @@
-package com.aventstack.kinsjen.api.automationserver;
+package com.aventstack.kinsjen.api.jenkinsinstance;
 
 import com.aventstack.kinsjen.api.authtoken.AuthToken;
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -31,7 +31,7 @@ import java.util.stream.Collectors;
 @Data
 @Entity
 @Table(name = "automation_server")
-public class AutomationServer {
+public class JenkinsInstance {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -1,6 +1,6 @@
 package com.aventstack.kinsjen.api.pipeline;
 
-import com.aventstack.kinsjen.api.automationserver.AutomationServer;
+import com.aventstack.kinsjen.api.jenkinsinstance.JenkinsInstance;
 import lombok.Data;
 
 import javax.persistence.Column;
@@ -20,7 +20,7 @@ public class Pipeline {
     private long id;
 
     @Column(name = "automation_server")
-    private AutomationServer.AutomationServerEnum automationServer;
+    private JenkinsInstance.AutomationServerEnum automationServer;
 
     private String org;
     private String name;

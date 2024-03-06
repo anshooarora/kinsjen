@@ -1,4 +1,4 @@
-package com.aventstack.kinsjen.api.automationserver;
+package com.aventstack.kinsjen.api.jenkinsinstance;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,9 +18,9 @@ import java.util.Optional;
 
 @Service
 @Transactional(readOnly = true)
-public class AutomationServerService {
+public class JenkinsInstanceService {
 
-    private static final Logger log = LoggerFactory.getLogger(AutomationServer.class);
+    private static final Logger log = LoggerFactory.getLogger(JenkinsInstance.class);
     private static final ExampleMatcher SEARCH_CONDITIONS = ExampleMatcher
             .matching()
             .withMatcher("name", ExampleMatcher.GenericPropertyMatchers.exact())
@@ -29,48 +29,48 @@ public class AutomationServerService {
             .withIgnorePaths("id");
 
     @Autowired
-    private AutomationServerRepository repository;
+    private JenkinsInstanceRepository repository;
 
     @Cacheable(value = "automationServers")
-    public Page<AutomationServer> findAll(final Pageable pageable) {
+    public Page<JenkinsInstance> findAll(final Pageable pageable) {
         return repository.findAll(pageable);
     }
 
     @Cacheable(value = "automationServer", key = "#id")
-    public Optional<AutomationServer> findById(final long id) {
+    public Optional<JenkinsInstance> findById(final long id) {
         return repository.findById(id);
     }
 
-    public List<AutomationServer> search(final String name, final String type, final String url) {
-        final AutomationServer server = new AutomationServer();
+    public List<JenkinsInstance> search(final String name, final String type, final String url) {
+        final JenkinsInstance server = new JenkinsInstance();
         server.setName(name);
-        server.setType(AutomationServer.AutomationServerEnum.fromString(type));
+        server.setType(JenkinsInstance.AutomationServerEnum.fromString(type));
         server.setUrl(url);
-        Example<AutomationServer> example = Example.of(server, SEARCH_CONDITIONS);
+        Example<JenkinsInstance> example = Example.of(server, SEARCH_CONDITIONS);
         return repository.findAll(example);
     }
 
     @Transactional
     @CacheEvict(value = "automationServers", allEntries = true)
-    @CachePut(value = "automationServer", key = "#automationServer.id")
-    public AutomationServer create(final AutomationServer automationServer) {
-        log.info("Saving a new instance of automation server " + automationServer);
-        final Optional<AutomationServer> found = repository.findByName(automationServer.getName());
+    @CachePut(value = "jenkinsInstance", key = "#jenkinsInstance.id")
+    public JenkinsInstance create(final JenkinsInstance jenkinsInstance) {
+        log.info("Saving a new instance of automation server " + jenkinsInstance);
+        final Optional<JenkinsInstance> found = repository.findByName(jenkinsInstance.getName());
         found.ifPresent(s -> {
-            throw new DuplicateAutomationServerException("Automation server with name " +
+            throw new DuplicateJenkinsInstanceException("Automation server with name " +
                     s.getName() + " for url " + s.getUrl() + " already exists");
         });
-        return repository.save(automationServer);
+        return repository.save(jenkinsInstance);
     }
 
     @Transactional
     @CacheEvict(value = "automationServers", allEntries = true)
-    @CachePut(value = "automationServer", key = "#automationServer.id")
-    public void update(final AutomationServer automationServer) {
-        log.info("Updating automation server " + automationServer);
-        repository.findById(automationServer.getId()).ifPresentOrElse(
-            x -> repository.save(automationServer),
-            () -> { throw new AutomationServerNotFoundException("Automation server with ID " + automationServer.getId() + " was not found"); }
+    @CachePut(value = "jenkinsInstance", key = "#jenkinsInstance.id")
+    public void update(final JenkinsInstance jenkinsInstance) {
+        log.info("Updating automation server " + jenkinsInstance);
+        repository.findById(jenkinsInstance.getId()).ifPresentOrElse(
+            x -> repository.save(jenkinsInstance),
+            () -> { throw new JenkinsInstanceNotFoundException("Automation server with ID " + jenkinsInstance.getId() + " was not found"); }
         );
     }
 

@@ -1,4 +1,4 @@
-package com.aventstack.kinsjen.api.automationserver;
+package com.aventstack.kinsjen.api.jenkinsinstance;
 
 import com.aventstack.kinsjen.domain.BadRequestErrorResponse;
 import org.apache.commons.lang3.StringUtils;
@@ -20,18 +20,18 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/automation-servers")
-public class AutomationServerController {
+public class JenkinsInstanceController {
 
     @Autowired
-    private AutomationServerService service;
+    private JenkinsInstanceService service;
 
     @GetMapping
-    public Page<AutomationServer> findAll(final Pageable pageable) {
+    public Page<JenkinsInstance> findAll(final Pageable pageable) {
         return service.findAll(pageable);
     }
 
     @GetMapping("/{id}")
-    public Optional<AutomationServer> find(@PathVariable final long id) {
+    public Optional<JenkinsInstance> find(@PathVariable final long id) {
         return service.findById(id);
     }
 
@@ -46,16 +46,16 @@ public class AutomationServerController {
     }
 
     @PostMapping
-    public AutomationServer create(@RequestBody final AutomationServer server) {
-        if (server.getType().equals(AutomationServer.AutomationServerEnum.UNSUPPORTED_AUTOMATION_SERVER)) {
+    public JenkinsInstance create(@RequestBody final JenkinsInstance server) {
+        if (server.getType().equals(JenkinsInstance.AutomationServerEnum.UNSUPPORTED_AUTOMATION_SERVER)) {
             throw new UnsupportedAutomationServerException("Invalid automation server type provided, expecting one of possible types: "
-                    + AutomationServer.AutomationServerEnum.validValues());
+                    + JenkinsInstance.AutomationServerEnum.validValues());
         }
         return service.create(server);
     }
 
     @PutMapping
-    public ResponseEntity<Void> update(@RequestBody final AutomationServer server) {
+    public ResponseEntity<Void> update(@RequestBody final JenkinsInstance server) {
         service.update(server);
         return ResponseEntity.ok().build();
     }
