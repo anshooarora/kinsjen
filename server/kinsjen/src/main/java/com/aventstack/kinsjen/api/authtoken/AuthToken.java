@@ -1,4 +1,4 @@
-package com.aventstack.kinsjen.api.automationserver;
+package com.aventstack.kinsjen.api.authtoken;
 
 import lombok.Data;
 import org.springframework.data.annotation.CreatedDate;
