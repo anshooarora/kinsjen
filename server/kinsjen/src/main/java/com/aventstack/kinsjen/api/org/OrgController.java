@@ -1,5 +1,6 @@
 package com.aventstack.kinsjen.api.org;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -24,18 +25,18 @@ public class OrgController {
     private OrgService service;
 
     @GetMapping
-    public Page<Org> findAll(final Pageable pageable) {
-        return service.findAll(pageable);
+    public ResponseEntity<Page<Org>> findAll(@RequestParam(required = false, defaultValue = "0") final long id,
+                                             @RequestParam(required = false) final String name,
+                                             final Pageable pageable) {
+        if (0 == id && StringUtils.isBlank(name)) {
+            return ResponseEntity.ok(service.findAll(pageable));
+        }
+        return ResponseEntity.ok(service.search(id, name, pageable));
     }
 
     @GetMapping("/{id}")
     public Optional<Org> find(@PathVariable final long id) {
         return service.findById(id);
-    }
-
-    @GetMapping("/q")
-    public  Optional<Org> search(@RequestParam final String name) {
-        return service.findByName(name);
     }
 
     @PostMapping

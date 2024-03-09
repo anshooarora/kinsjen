@@ -6,6 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -32,9 +34,12 @@ public class OrgService {
         return repository.findById(id);
     }
 
-    @Cacheable(value = "org", key = "#name")
-    public Optional<Org> findByName(final String name) {
-        return repository.findByName(name);
+    public Page<Org> search(final long id, final String name, final Pageable pageable) {
+        final Org org = new Org();
+        org.setId(id);
+        org.setName(name);
+        Example<Org> example = Example.of(org, ExampleMatcher.matchingAny());
+        return repository.findAll(example, pageable);
     }
 
     @Transactional
