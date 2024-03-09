@@ -1,6 +1,5 @@
 package com.aventstack.kinsjen.api.pipeline;
 
-import com.aventstack.kinsjen.domain.BadRequestErrorResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -26,25 +25,21 @@ public class PipelineController {
     private PipelineService service;
 
     @GetMapping
-    public Page<Pipeline> findAll(final Pageable pageable) {
-        return service.findAll(pageable);
+    public ResponseEntity<Page<Pipeline>> findAll(@RequestParam(required = false) final String name,
+                                                  @RequestParam(required = false) final String org,
+                                                  @RequestParam(required = false) final String automationServer,
+                                                  @RequestParam(required = false) final String url,
+                                                  final Pageable pageable) {
+        if (StringUtils.isBlank(name) && StringUtils.isBlank(org)
+                && StringUtils.isBlank(automationServer) && StringUtils.isBlank(url)) {
+            return ResponseEntity.ok(service.findAll(pageable));
+        }
+        return ResponseEntity.ok(service.search(name, org, automationServer, url, pageable));
     }
 
     @GetMapping("/{id}")
     public Optional<Pipeline> find(@PathVariable final long id) {
         return service.findById(id);
-    }
-
-    @GetMapping("/q")
-    public ResponseEntity<?> search(@RequestParam(required = false) final String name,
-                                    @RequestParam(required = false) final String org,
-                                    @RequestParam(required = false) final String automationServer,
-                                    @RequestParam(required = false) final String url) {
-        if (StringUtils.isBlank(name) && StringUtils.isBlank(org)
-                && StringUtils.isBlank(automationServer) && StringUtils.isBlank(url)) {
-            return ResponseEntity.badRequest().body(new BadRequestErrorResponse("Search parameters missing"));
-        }
-        return ResponseEntity.ok(service.search(name, org, automationServer, url));
     }
 
     @PostMapping

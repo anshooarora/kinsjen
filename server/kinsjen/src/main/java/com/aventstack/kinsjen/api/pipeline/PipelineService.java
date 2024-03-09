@@ -14,7 +14,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -43,14 +42,14 @@ public class PipelineService {
         return repository.findById(id);
     }
 
-    public List<Pipeline> search(final String name, final String org, final String automationServer, final String url) {
+    public Page<Pipeline> search(final String name, final String org, final String automationServer, final String url, final Pageable pageable) {
         final Pipeline pipeline = new Pipeline();
         pipeline.setOrg(org);
         pipeline.setName(name);
         pipeline.setAutomationServer(JenkinsInstance.AutomationServerEnum.fromString(automationServer));
         pipeline.setUrl(url);
         Example<Pipeline> example = Example.of(pipeline, SEARCH_CONDITIONS);
-        return repository.findAll(example);
+        return repository.findAll(example, pageable);
     }
 
     @Transactional
