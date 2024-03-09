@@ -1,9 +1,7 @@
 package com.aventstack.kinsjen.api.jenkinsinstance;
 
-import com.aventstack.kinsjen.domain.BadRequestErrorResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -26,23 +24,20 @@ public class JenkinsInstanceController {
     private JenkinsInstanceService service;
 
     @GetMapping
-    public Page<JenkinsInstance> findAll(final Pageable pageable) {
-        return service.findAll(pageable);
+    public ResponseEntity<?> find(@RequestParam(required = false, defaultValue = "0") final long id,
+                                    @RequestParam(required = false) final String name,
+                                    @RequestParam(required = false) final String type,
+                                    @RequestParam(required = false) final String url,
+                                    final Pageable pageable) {
+        if (0 >= id && StringUtils.isBlank(name) && StringUtils.isBlank(type) && StringUtils.isBlank(url)) {
+            return ResponseEntity.ok(service.findAll(pageable));
+        }
+        return ResponseEntity.ok(service.search(name, type, url, pageable));
     }
 
     @GetMapping("/{id}")
     public Optional<JenkinsInstance> find(@PathVariable final long id) {
         return service.findById(id);
-    }
-
-    @GetMapping("/q")
-    public ResponseEntity<?> search(@RequestParam(required = false) final String name,
-                                    @RequestParam(required = false) final String type,
-                                    @RequestParam(required = false) final String url) {
-        if (StringUtils.isBlank(name) && StringUtils.isBlank(type) && StringUtils.isBlank(url)) {
-            return ResponseEntity.badRequest().body(new BadRequestErrorResponse("Search parameters missing"));
-        }
-        return ResponseEntity.ok(service.search(name, type, url));
     }
 
     @PostMapping

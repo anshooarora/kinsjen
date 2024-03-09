@@ -13,7 +13,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -41,20 +40,20 @@ public class JenkinsInstanceService {
         return repository.findById(id);
     }
 
-    public List<JenkinsInstance> search(final String name, final String type, final String url) {
+    public Page<JenkinsInstance> search(final String name, final String type, final String url, final Pageable pageable) {
         final JenkinsInstance server = new JenkinsInstance();
         server.setName(name);
         server.setType(JenkinsInstance.AutomationServerEnum.fromString(type));
         server.setUrl(url);
         Example<JenkinsInstance> example = Example.of(server, SEARCH_CONDITIONS);
-        return repository.findAll(example);
+        return repository.findAll(example, pageable);
     }
 
     @Transactional
     @CacheEvict(value = "jenkinsInstances", allEntries = true)
     @CachePut(value = "jenkinsInstance", key = "#jenkinsInstance.id")
     public JenkinsInstance create(final JenkinsInstance jenkinsInstance) {
-        log.info("Saving a new instance of automation server " + jenkinsInstance);
+        log.info("Saving a new instance of Jenkins instance " + jenkinsInstance);
         final Optional<JenkinsInstance> found = repository.findByName(jenkinsInstance.getName());
         found.ifPresent(s -> {
             throw new DuplicateJenkinsInstanceException("Jenkins instance with name " +

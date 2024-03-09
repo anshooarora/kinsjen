@@ -1,5 +1,7 @@
 package com.aventstack.kinsjen.api.credential;
 
+import com.aventstack.kinsjen.api.jenkinsinstance.JenkinsInstanceNotFoundException;
+import com.aventstack.kinsjen.api.jenkinsinstance.JenkinsInstanceService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +15,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -21,13 +22,12 @@ import java.util.Optional;
 public class CredentialService {
 
     private static final Logger log = LoggerFactory.getLogger(CredentialService.class);
-    private static final ExampleMatcher SEARCH_CONDITIONS = ExampleMatcher
-            .matching()
-            .withMatcher("name", ExampleMatcher.GenericPropertyMatchers.exact())
-            .withIgnorePaths("id");
 
     @Autowired
     private CredentialRepository repository;
+
+    @Autowired
+    private JenkinsInstanceService jenkinsInstanceService;
 
     @Cacheable(value = "credentials")
     public Page<Credential> findAll(final Pageable pageable) {
@@ -39,16 +39,13 @@ public class CredentialService {
         return repository.findById(id);
     }
 
-    @Cacheable(value = "credential", key = "#jenkinsInstanceId")
-    public Optional<Credential> findByJenkinsInstanceId(final long jenkinsInstanceId) {
-        return repository.findByJenkinsInstanceId(jenkinsInstanceId);
-    }
-
-    public List<Credential> search(final String name) {
+    public Page<Credential> search(final long id, final String name, final long jenkinsInstanceId, final Pageable pageable) {
         final Credential credential = new Credential();
+        credential.setId(id);
         credential.setName(name);
-        Example<Credential> example = Example.of(credential, SEARCH_CONDITIONS);
-        return repository.findAll(example);
+        credential.setJenkinsInstanceId(jenkinsInstanceId);
+        Example<Credential> example = Example.of(credential, ExampleMatcher.matchingAny());
+        return repository.findAll(example, pageable);
     }
 
     @Transactional
@@ -56,6 +53,16 @@ public class CredentialService {
     @CachePut(value = "credential", key = "#credential.id")
     public Credential create(final Credential credential) {
         log.info("Saving a new instance of credential " + credential);
+
+        jenkinsInstanceService.findById(credential.getJenkinsInstanceId()).ifPresentOrElse(
+            x -> log.debug("A new credential will be created for Jenkins instance: " + credential.getJenkinsInstanceId()),
+            () -> { throw new JenkinsInstanceNotFoundException("Jenkins instance with ID " + credential.getJenkinsInstanceId() + " was not found"); }
+        );
+
+        final Optional<Credential> found = repository.findByName(credential.getName());
+        found.ifPresent(s -> {
+            throw new DuplicateCredentialException("Credential with name " + s.getName() + " already exists");
+        });
         return repository.save(credential);
     }
 

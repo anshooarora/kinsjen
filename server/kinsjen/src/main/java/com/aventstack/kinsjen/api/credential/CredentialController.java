@@ -1,7 +1,7 @@
 package com.aventstack.kinsjen.api.credential;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -22,22 +22,21 @@ public class CredentialController {
     @Autowired
     private CredentialService service;
 
+    //TODO: encrypt username & apiToken
     @GetMapping
-    public Page<Credential> findAll(final Pageable pageable) {
-        return service.findAll(pageable);
+    public ResponseEntity<?> find(@RequestParam(required = false, defaultValue = "0") final long id,
+                                 @RequestParam(required = false) final String name,
+                                 @RequestParam(required = false, defaultValue = "0") final long jenkinsInstanceId,
+                                 final Pageable pageable) {
+        if (0 >= id && StringUtils.isBlank(name) && 0 == jenkinsInstanceId) {
+            return ResponseEntity.ok(service.findAll(pageable));
+        }
+        return ResponseEntity.ok(service.search(id, name, jenkinsInstanceId, pageable));
     }
 
     @GetMapping("/{id}")
     public Optional<Credential> find(@PathVariable final long id) {
         return service.findById(id);
-    }
-
-    @GetMapping("/q")
-    public Optional<Credential> search(@RequestParam(required = false) final String name,
-            @RequestParam(required = false) final Long jenkinsInstanceId) {
-        //TODO: allow searching by name
-        //TODO: encrypt username & apiToken
-        return service.findByJenkinsInstanceId(jenkinsInstanceId);
     }
 
     @PostMapping
