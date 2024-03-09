@@ -31,12 +31,12 @@ public class JenkinsInstanceService {
     @Autowired
     private JenkinsInstanceRepository repository;
 
-    @Cacheable(value = "automationServers")
+    @Cacheable(value = "jenkinsInstances")
     public Page<JenkinsInstance> findAll(final Pageable pageable) {
         return repository.findAll(pageable);
     }
 
-    @Cacheable(value = "automationServer", key = "#id")
+    @Cacheable(value = "jenkinsInstance", key = "#id")
     public Optional<JenkinsInstance> findById(final long id) {
         return repository.findById(id);
     }
@@ -51,36 +51,36 @@ public class JenkinsInstanceService {
     }
 
     @Transactional
-    @CacheEvict(value = "automationServers", allEntries = true)
+    @CacheEvict(value = "jenkinsInstances", allEntries = true)
     @CachePut(value = "jenkinsInstance", key = "#jenkinsInstance.id")
     public JenkinsInstance create(final JenkinsInstance jenkinsInstance) {
         log.info("Saving a new instance of automation server " + jenkinsInstance);
         final Optional<JenkinsInstance> found = repository.findByName(jenkinsInstance.getName());
         found.ifPresent(s -> {
-            throw new DuplicateJenkinsInstanceException("Automation server with name " +
+            throw new DuplicateJenkinsInstanceException("Jenkins instance with name " +
                     s.getName() + " for url " + s.getUrl() + " already exists");
         });
         return repository.save(jenkinsInstance);
     }
 
     @Transactional
-    @CacheEvict(value = "automationServers", allEntries = true)
+    @CacheEvict(value = "jenkinsInstances", allEntries = true)
     @CachePut(value = "jenkinsInstance", key = "#jenkinsInstance.id")
     public void update(final JenkinsInstance jenkinsInstance) {
-        log.info("Updating automation server " + jenkinsInstance);
+        log.info("Updating Jenkins instance " + jenkinsInstance);
         repository.findById(jenkinsInstance.getId()).ifPresentOrElse(
             x -> repository.save(jenkinsInstance),
-            () -> { throw new JenkinsInstanceNotFoundException("Automation server with ID " + jenkinsInstance.getId() + " was not found"); }
+            () -> { throw new JenkinsInstanceNotFoundException("Jenkins instance with ID " + jenkinsInstance.getId() + " was not found"); }
         );
     }
 
     @Transactional
-    @CacheEvict(value = "automationServers", allEntries = true)
-    @CachePut(value = "automationServer", key = "#id")
+    @CacheEvict(value = "jenkinsInstances", allEntries = true)
+    @CachePut(value = "jenkinsInstance", key = "#id")
     public void delete(final long id) {
-        log.info("Deleting automation server with id " + id);
+        log.info("Deleting Jenkins instance with id " + id);
         repository.deleteById(id);
-        log.info("Automation server " + id + " was deleted successfully");
+        log.info("Jenkins instance " + id + " was deleted successfully");
     }
 
 }

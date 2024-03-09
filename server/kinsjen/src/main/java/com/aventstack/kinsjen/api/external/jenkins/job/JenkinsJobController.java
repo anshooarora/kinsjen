@@ -19,8 +19,10 @@ public class JenkinsJobController {
     private JenkinsJobService service;
 
     @GetMapping
-    public ResponseEntity<List<Job>> findAll(@RequestParam(defaultValue = "false") final boolean recursive) {
-        return ResponseEntity.ok(service.findAllJobs(URI, recursive));
+    public ResponseEntity<List<Job>> findAll(@RequestParam final int jenkinsInstanceId,
+            @RequestParam final int credentialId,
+            @RequestParam(defaultValue = "false") final boolean recursive) {
+        return ResponseEntity.ok(service.findAllJobs(jenkinsInstanceId, credentialId, recursive));
     }
 
 }

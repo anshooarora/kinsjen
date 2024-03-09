@@ -1,6 +1,5 @@
 package com.aventstack.kinsjen.api.jenkinsinstance;
 
-import com.aventstack.kinsjen.api.authtoken.AuthToken;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 import com.fasterxml.jackson.core.JsonParser;
@@ -11,15 +10,11 @@ import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 import lombok.Data;
 import org.springframework.data.annotation.CreatedDate;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.NotBlank;
 import java.io.IOException;
@@ -30,7 +25,7 @@ import java.util.stream.Collectors;
 
 @Data
 @Entity
-@Table(name = "automation_server")
+@Table(name = "jenkins_instance")
 public class JenkinsInstance {
 
     @Id
@@ -48,10 +43,6 @@ public class JenkinsInstance {
     private String url;
 
     private AutomationServerEnum type = AutomationServerEnum.JENKINS;
-
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    @JoinColumn(name = "automation_server_id", referencedColumnName = "id")
-    private List<AuthToken> authTokens;
 
     @JsonDeserialize(using = AutomationServerEnumDeserializer.class)
     public enum AutomationServerEnum {

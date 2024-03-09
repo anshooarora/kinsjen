@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/automation-servers")
+@RequestMapping("/jenkins")
 public class JenkinsInstanceController {
 
     @Autowired
@@ -46,12 +46,8 @@ public class JenkinsInstanceController {
     }
 
     @PostMapping
-    public JenkinsInstance create(@RequestBody final JenkinsInstance server) {
-        if (server.getType().equals(JenkinsInstance.AutomationServerEnum.UNSUPPORTED_AUTOMATION_SERVER)) {
-            throw new UnsupportedAutomationServerException("Invalid automation server type provided, expecting one of possible types: "
-                    + JenkinsInstance.AutomationServerEnum.validValues());
-        }
-        return service.create(server);
+    public ResponseEntity<JenkinsInstance> create(@RequestBody final JenkinsInstance server) {
+        return ResponseEntity.ok(service.create(server));
     }
 
     @PutMapping
