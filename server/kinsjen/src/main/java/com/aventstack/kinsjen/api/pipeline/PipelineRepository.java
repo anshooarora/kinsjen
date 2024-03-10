@@ -9,8 +9,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface PipelineRepository extends PagingAndSortingRepository<Pipeline, Long> {
 
-    Page<Pipeline> findByOrg(final String org, final Pageable pageable);
-
     Page<Pipeline> findAll(final Example<Pipeline> example, final Pageable pageable);
 
 }
