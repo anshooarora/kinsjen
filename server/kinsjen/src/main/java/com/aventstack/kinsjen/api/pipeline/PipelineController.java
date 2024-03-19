@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.Valid;
 import java.util.Optional;
 
 @RestController
@@ -26,12 +27,11 @@ public class PipelineController {
 
     @GetMapping
     public ResponseEntity<Page<Pipeline>> findAll(@RequestParam(required = false) final String name,
-                                                  @RequestParam(required = false) final String org,
+                                                  @RequestParam(required = false, defaultValue = "-1L") final long org,
                                                   @RequestParam(required = false) final String automationServer,
                                                   @RequestParam(required = false) final String url,
                                                   final Pageable pageable) {
-        if (StringUtils.isBlank(name) && StringUtils.isBlank(org)
-                && StringUtils.isBlank(automationServer) && StringUtils.isBlank(url)) {
+        if (StringUtils.isAllBlank(name, automationServer, url) && 0L > org) {
             return ResponseEntity.ok(service.findAll(pageable));
         }
         return ResponseEntity.ok(service.search(name, org, automationServer, url, pageable));
@@ -43,13 +43,13 @@ public class PipelineController {
     }
 
     @PostMapping
-    public Pipeline create(@RequestBody final Pipeline pipeline) {
+    public Pipeline create(@Valid @RequestBody final Pipeline pipeline) {
         return service.create(pipeline);
     }
 
     @PutMapping
-    public ResponseEntity<Void> update(@RequestBody final Pipeline server) {
-        service.update(server);
+    public ResponseEntity<Void> update(@Valid @RequestBody final Pipeline pipeline) {
+        service.update(pipeline);
         return ResponseEntity.ok().build();
     }
 

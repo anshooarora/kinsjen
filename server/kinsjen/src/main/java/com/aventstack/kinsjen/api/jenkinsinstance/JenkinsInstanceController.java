@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.Valid;
 import java.util.Optional;
 
 @RestController
@@ -41,12 +42,12 @@ public class JenkinsInstanceController {
     }
 
     @PostMapping
-    public ResponseEntity<JenkinsInstance> create(@RequestBody final JenkinsInstance server) {
+    public ResponseEntity<JenkinsInstance> create(@Valid @RequestBody final JenkinsInstance server) {
         return ResponseEntity.ok(service.create(server));
     }
 
     @PutMapping
-    public ResponseEntity<Void> update(@RequestBody final JenkinsInstance server) {
+    public ResponseEntity<Void> update(@Valid @RequestBody final JenkinsInstance server) {
         service.update(server);
         return ResponseEntity.ok().build();
     }

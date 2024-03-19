@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.Valid;
 import java.util.Optional;
 
 @RestController
@@ -40,12 +41,12 @@ public class OrgController {
     }
 
     @PostMapping
-    public Org create(@RequestBody final Org org) {
+    public Org create(@Valid @RequestBody final Org org) {
         return service.create(org);
     }
 
     @PutMapping
-    public ResponseEntity<Void> update(@RequestBody final Org org) {
+    public ResponseEntity<Void> update(@Valid @RequestBody final Org org) {
         service.update(org);
         return ResponseEntity.ok().build();
     }

@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.Valid;
 import java.util.Optional;
 
 @RestController
@@ -40,7 +41,7 @@ public class CredentialController {
     }
 
     @PostMapping
-    public ResponseEntity<Credential> create(@RequestBody final Credential credential) {
+    public ResponseEntity<Credential> create(@Valid @RequestBody final Credential credential) {
         return ResponseEntity.ok(service.create(credential));
     }
 
