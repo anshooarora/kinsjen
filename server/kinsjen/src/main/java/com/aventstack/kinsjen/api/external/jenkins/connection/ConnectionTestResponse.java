@@ -1,4 +1,4 @@
-package com.aventstack.kinsjen.api.external.jenkins.conn;
+package com.aventstack.kinsjen.api.external.jenkins.connection;
 
 import lombok.Data;
 

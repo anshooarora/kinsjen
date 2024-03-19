@@ -1,4 +1,4 @@
-package com.aventstack.kinsjen.api.external.jenkins.conn;
+package com.aventstack.kinsjen.api.external.jenkins.connection;
 
 import com.aventstack.kinsjen.api.credential.Credential;
 import com.aventstack.kinsjen.api.jenkinsinstance.JenkinsInstance;

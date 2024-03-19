@@ -1,4 +1,4 @@
-package com.aventstack.kinsjen.api.external.jenkins.conn;
+package com.aventstack.kinsjen.api.external.jenkins.connection;
 
 import lombok.Data;
 
@@ -8,7 +8,6 @@ import java.util.List;
 public class JenkinsBaseResponse {
 
     private String _class;
-    private List<AssignedLabel> assignedLabels;
     private String mode;
     private String nodeDescription;
     private String nodeName;
