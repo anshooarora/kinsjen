@@ -22,9 +22,9 @@ public class Pipeline {
     @Column(name = "automation_server")
     private JenkinsInstance.AutomationServerEnum automationServer;
 
-    private long jenkinsInstanceId;
-    private long credentialId;
-    private long orgId;
+    private Long jenkinsInstanceId;
+    private Long credentialId;
+    private Long orgId;
     private String name;
     private String url;
     private String _class;

@@ -1,9 +1,10 @@
 package com.aventstack.kinsjen.api.pipeline;
 
 import com.aventstack.kinsjen.api.external.jenkins.JenkinsCommonsService;
-import com.aventstack.kinsjen.api.jenkinsinstance.JenkinsInstance;
+import com.aventstack.kinsjen.api.org.Org;
 import com.aventstack.kinsjen.api.org.OrgNotFoundException;
 import com.aventstack.kinsjen.api.org.OrgService;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +18,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -26,6 +28,8 @@ public class PipelineService {
     private static final Logger log = LoggerFactory.getLogger(PipelineService.class);
     private static final ExampleMatcher SEARCH_CONDITIONS = ExampleMatcher
             .matching()
+            .withMatcher("jenkinsInstanceId", ExampleMatcher.GenericPropertyMatchers.exact())
+            .withMatcher("orgId", ExampleMatcher.GenericPropertyMatchers.exact())
             .withMatcher("org", ExampleMatcher.GenericPropertyMatchers.exact().ignoreCase())
             .withMatcher("name", ExampleMatcher.GenericPropertyMatchers.exact().ignoreCase())
             .withMatcher("automationServer", ExampleMatcher.GenericPropertyMatchers.exact().ignoreCase())
@@ -51,12 +55,22 @@ public class PipelineService {
         return repository.findById(id);
     }
 
-    public Page<Pipeline> search(final String name, final long org, final String automationServer, final String url, final Pageable pageable) {
+    public Page<Pipeline> search(final Long jenkinsInstanceId, final String name, final Long orgId,
+                                 final String orgName, final String url,
+                                 final Pageable pageable) {
         final Pipeline pipeline = new Pipeline();
-        pipeline.setOrgId(org);
+        pipeline.setJenkinsInstanceId(jenkinsInstanceId);
+        pipeline.setOrgId(orgId);
         pipeline.setName(name);
-        pipeline.setAutomationServer(JenkinsInstance.AutomationServerEnum.fromString(automationServer));
         pipeline.setUrl(url);
+
+        if (!StringUtils.isBlank(orgName)) {
+            final List<Org> org = orgService.search(0, orgName);
+            if (!org.isEmpty()) {
+                pipeline.setOrgId(org.get(0).getId());
+            }
+        }
+
         Example<Pipeline> example = Example.of(pipeline, SEARCH_CONDITIONS);
         return repository.findAll(example, pageable);
     }

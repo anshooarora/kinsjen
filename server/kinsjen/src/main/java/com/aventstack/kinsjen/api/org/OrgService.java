@@ -13,6 +13,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -40,6 +41,14 @@ public class OrgService {
         org.setName(name);
         Example<Org> example = Example.of(org, ExampleMatcher.matchingAny());
         return repository.findAll(example, pageable);
+    }
+
+    public List<Org> search(final long id, final String name) {
+        final Org org = new Org();
+        org.setId(id);
+        org.setName(name);
+        Example<Org> example = Example.of(org, ExampleMatcher.matchingAny());
+        return repository.findAll(example);
     }
 
     @Transactional

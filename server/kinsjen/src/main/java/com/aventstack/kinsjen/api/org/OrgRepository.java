@@ -6,12 +6,15 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
 public interface OrgRepository extends PagingAndSortingRepository<Org, Long> {
 
     Page<Org> findAll(final Example<Org> example, final Pageable pageable);
+
+    List<Org> findAll(final Example<Org> example);
 
     Optional<Org> findByName(final String name);
 

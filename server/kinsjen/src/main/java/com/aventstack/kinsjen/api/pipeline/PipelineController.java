@@ -26,15 +26,16 @@ public class PipelineController {
     private PipelineService service;
 
     @GetMapping
-    public ResponseEntity<Page<Pipeline>> findAll(@RequestParam(required = false) final String name,
-                                                  @RequestParam(required = false, defaultValue = "-1L") final long org,
-                                                  @RequestParam(required = false) final String automationServer,
+    public ResponseEntity<Page<Pipeline>> findAll(@RequestParam(required = false) final Long jenkinsInstanceId,
+                                                  @RequestParam(required = false) final String name,
+                                                  @RequestParam(required = false) final Long orgId,
+                                                  @RequestParam(required = false) final String orgName,
                                                   @RequestParam(required = false) final String url,
                                                   final Pageable pageable) {
-        if (StringUtils.isAllBlank(name, automationServer, url) && 0L > org) {
+        if (StringUtils.isAllBlank(name, orgName, url) && null == orgId && null == jenkinsInstanceId) {
             return ResponseEntity.ok(service.findAll(pageable));
         }
-        return ResponseEntity.ok(service.search(name, org, automationServer, url, pageable));
+        return ResponseEntity.ok(service.search(jenkinsInstanceId, name, orgId, orgName, url, pageable));
     }
 
     @GetMapping("/{id}")

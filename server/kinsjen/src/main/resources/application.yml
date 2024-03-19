@@ -6,7 +6,7 @@ spring:
   jpa:
     show-sql: true
     hibernate:
-      ddl-auto: create # [ validate, create, update, none, create-drop ]
+      ddl-auto: update # [ validate, create, update, none, create-drop ]
   datasource:
     hikari:
       maxLifeTime: 30000
