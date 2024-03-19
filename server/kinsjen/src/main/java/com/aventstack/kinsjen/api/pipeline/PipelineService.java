@@ -1,6 +1,9 @@
 package com.aventstack.kinsjen.api.pipeline;
 
+import com.aventstack.kinsjen.api.external.jenkins.JenkinsCommonsService;
 import com.aventstack.kinsjen.api.jenkinsinstance.JenkinsInstance;
+import com.aventstack.kinsjen.api.org.OrgNotFoundException;
+import com.aventstack.kinsjen.api.org.OrgService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +35,12 @@ public class PipelineService {
     @Autowired
     private PipelineRepository repository;
 
+    @Autowired
+    private JenkinsCommonsService jenkinsCommonsService;
+
+    @Autowired
+    private OrgService orgService;
+
     @Cacheable(value = "pipelines")
     public Page<Pipeline> findAll(final Pageable pageable) {
         return repository.findAll(pageable);
@@ -42,9 +51,9 @@ public class PipelineService {
         return repository.findById(id);
     }
 
-    public Page<Pipeline> search(final String name, final String org, final String automationServer, final String url, final Pageable pageable) {
+    public Page<Pipeline> search(final String name, final long org, final String automationServer, final String url, final Pageable pageable) {
         final Pipeline pipeline = new Pipeline();
-        pipeline.setOrg(org);
+        pipeline.setOrgId(org);
         pipeline.setName(name);
         pipeline.setAutomationServer(JenkinsInstance.AutomationServerEnum.fromString(automationServer));
         pipeline.setUrl(url);
@@ -56,6 +65,12 @@ public class PipelineService {
     @CacheEvict(value = "pipelines", allEntries = true)
     @CachePut(value = "pipeline", key = "#pipeline.id")
     public Pipeline create(final Pipeline pipeline) {
+        jenkinsCommonsService.findInstance(pipeline.getJenkinsInstanceId());
+        if (0 < pipeline.getCredentialId()) {
+            jenkinsCommonsService.findCredential(pipeline.getCredentialId());
+        }
+        orgService.findById(pipeline.getOrgId())
+            .orElseThrow(() -> new OrgNotFoundException("Org not found with id " + pipeline.getOrgId()));
         log.info("Saving a new instance of pipeline " + pipeline);
         return repository.save(pipeline);
     }
