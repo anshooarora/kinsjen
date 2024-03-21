@@ -1,4 +1,4 @@
-package com.aventstack.kinsjen.api.external.jenkins.build;
+package com.aventstack.kinsjen.api.external.jenkins.job;
 
 import lombok.Data;
 
@@ -23,6 +23,6 @@ public class Build {
     private long timestamp;
     private String url;
     private String builtOn;
-    private List<Culprits> culprits;
+    private List<Culprit> culprits;
 
 }

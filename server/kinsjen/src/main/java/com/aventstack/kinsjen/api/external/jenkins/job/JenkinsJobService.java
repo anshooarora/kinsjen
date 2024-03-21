@@ -5,6 +5,7 @@ import com.aventstack.kinsjen.api.credential.CredentialService;
 import com.aventstack.kinsjen.api.external.jenkins.JenkinsPath;
 import com.aventstack.kinsjen.api.external.jenkins.JenkinsCommonsService;
 import com.aventstack.kinsjen.api.jenkinsinstance.JenkinsInstance;
+import com.aventstack.kinsjen.api.pipeline.Pipeline;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +25,7 @@ import java.util.stream.Collectors;
 public class JenkinsJobService {
 
     private static final Logger log = LoggerFactory.getLogger(JenkinsJobService.class);
+    private static final short DEPTH = 1;
 
     @Autowired
     private RestTemplate restTemplate;
@@ -70,6 +72,20 @@ public class JenkinsJobService {
             }
         }
         return jobs;
+    }
+
+    public Job findJob(final Pipeline pipeline) {
+        final String uri = pipeline.getUrl() + JenkinsPath.API_JSON;
+        final String url = JenkinsPath.withDepth(DEPTH, uri);
+        final HttpHeaders headers = new HttpHeaders();
+
+        if (0 < pipeline.getCredentialId()) {
+            final Optional<Credential> cred = credentialService.findById(pipeline.getCredentialId());
+            cred.ifPresent(value -> headers.setBasicAuth(value.getUsername(), value.getApiToken()));
+        }
+
+        final ResponseEntity<Job> responseEntity = restTemplate.exchange(url, HttpMethod.GET, new HttpEntity<>(headers), Job.class);
+        return responseEntity.getBody();
     }
 
 }

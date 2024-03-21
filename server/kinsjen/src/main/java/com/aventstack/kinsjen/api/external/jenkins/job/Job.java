@@ -3,7 +3,6 @@ package com.aventstack.kinsjen.api.external.jenkins.job;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 
-import javax.validation.constraints.NotBlank;
 import java.util.List;
 
 @Data
@@ -15,15 +14,29 @@ public class Job {
     );
 
     private String _class;
-
-    @NotBlank(message = "Missing mandatory field 'org'")
+    private List<Action> actions;
+    private String description;
+    private String displayName;
+    private String displayNameOrNull;
+    private String fullDisplayName;
+    private String fullName;
     private String name;
-
     private String url;
+    private boolean buildable;
+    private List<Build> builds;
     private String color;
-
-    @NotBlank(message = "Missing mandatory field 'org'")
-    private String org;
+    private Build firstBuild;
+    private boolean inQueue;
+    private boolean keepDependencies;
+    private Build lastBuild;
+    private Build lastCompletedBuild;
+    private Build lastFailedBuild;
+    private Build lastStableBuild;
+    private Build lastSuccessfulBuild;
+    private Build lastUnstableBuild;
+    private Build lastUnsuccessfulBuild;
+    private int nextBuildNumber;
+    private boolean concurrentBuild;
 
     public boolean isFolder() {
         return null != _class && FOLDER_CLASSES.contains(_class);
