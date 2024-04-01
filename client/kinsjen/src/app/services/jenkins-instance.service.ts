@@ -15,8 +15,10 @@ export class JenkinsInstanceService {
 
   constructor(private http: HttpClient) { }
 
-  findAll(pageNumber: number): Observable<Page<JenkinsInstance>> {
-    const params = new HttpParams().set('page', pageNumber);
+  findAll(pageNumber: number = 0, size: number = 20): Observable<Page<JenkinsInstance>> {
+    const params = new HttpParams()
+      .set('page', pageNumber)
+      .set('size', size);
     return this.http.get<Page<JenkinsInstance>>(this.API_ENDPOINT.href, { params: params });
   }
 

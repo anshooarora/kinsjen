@@ -155,7 +155,7 @@ export class OrgComponent implements OnInit {
       }
     };
   }
-  
+
   ngOnDestroy(): void {
     this.destroy$.next(null);
     this.destroy$.complete();
@@ -233,7 +233,6 @@ export class OrgComponent implements OnInit {
         }))
         .subscribe({
           next: (response: JenkinsJob) => {
-            console.log('jenkinsjob')
             const seriesData: any = {
               name: response.displayName,
               data: []
@@ -256,7 +255,6 @@ export class OrgComponent implements OnInit {
               seriesData.data.push(data);
             }
             this.chartOptions.series = series;
-            console.log(series);
           },
           error: (err) => {
             this.error = JSON.stringify(err);

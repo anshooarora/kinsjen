@@ -86,6 +86,11 @@ public class PipelineService {
         orgService.findById(pipeline.getOrgId())
             .orElseThrow(() -> new OrgNotFoundException("Org not found with id " + pipeline.getOrgId()));
         log.info("Saving a new instance of pipeline " + pipeline);
+        final Page<Pipeline> pipelines = findAll(Pageable.ofSize(Integer.MAX_VALUE));
+        if (pipelines.stream().anyMatch(x -> x.getUrl().equals(pipeline.getUrl()))) {
+            throw new DuplicatePipelineException("Exception thrown when creating an already existing pipeline '"
+                    + pipeline.getName() + "' with url " + pipeline.getUrl());
+        }
         return repository.save(pipeline);
     }
 

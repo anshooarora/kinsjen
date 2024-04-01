@@ -1,8 +1,9 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Credential } from '../model/credential.model';
 import { environment } from '../../environments/environment';
+import { Page } from '../model/page.model';
 
 @Injectable({
   providedIn: 'root'
@@ -10,12 +11,19 @@ import { environment } from '../../environments/environment';
 export class CredentialService {
 
   private readonly PATH = 'credentials';
+  private readonly API_ENDPOINT = new URL(this.PATH, environment.apiURL);
 
   constructor(private http: HttpClient) { }
 
+  find(id: number = 0, jenkinsInstanceId: number = 0): Observable<Page<Credential>> {
+    const params = new HttpParams()
+      .set('id', id)
+      .set('jenkinsInstanceId', jenkinsInstanceId);
+      return this.http.get<Page<Credential>>(this.API_ENDPOINT.href, { params: params });
+  }
+
   save(credential: Credential): Observable<Credential> {
-    const url = new URL(environment.apiURL, this.PATH);
-    return this.http.post<Credential>(url.href, credential);
+    return this.http.post<Credential>(this.API_ENDPOINT.href, credential);
   }
 
 }

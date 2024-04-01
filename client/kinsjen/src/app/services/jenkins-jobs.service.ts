@@ -14,8 +14,11 @@ export class JenkinsJobsService {
 
   constructor(private http: HttpClient) { }
 
-  findJobs(recursive: boolean = true): Observable<JenkinsJob[]> {
-    const params = new HttpParams().set('recursive', recursive);
+  findJobs(jenkinsInstanceId: number = -1, credentialId: number = -1, recursive: boolean = true): Observable<JenkinsJob[]> {
+    const params = new HttpParams()
+      .set('jenkinsInstanceId', jenkinsInstanceId)
+      .set('credentialId', credentialId)
+      .set('recursive', recursive);
     return this.http.get<JenkinsJob[]>(this.API_ENDPOINT.href, { params: params });
   }
 

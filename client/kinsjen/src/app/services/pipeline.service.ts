@@ -25,4 +25,8 @@ export class PipelineService {
     return this.http.get<Pipeline>(url.href);
   }
 
+  save(pipeline: Pipeline): Observable<Pipeline> {
+    return this.http.post<Pipeline>(this.API_ENDPOINT.href, pipeline);
+  }
+
 }
