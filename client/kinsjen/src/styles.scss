@@ -12,6 +12,9 @@ body, html, app-root {
     font-weight: 400;
     font-family: Inter, Helvetica, sans-serif;
 }
+header {
+    border-bottom: 1px solid var(--bs-gray-300);
+}
 app-pipeline {
     height: 90%;
 }

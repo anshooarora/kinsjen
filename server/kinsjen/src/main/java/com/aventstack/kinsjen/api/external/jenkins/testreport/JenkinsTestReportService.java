@@ -3,7 +3,6 @@ package com.aventstack.kinsjen.api.external.jenkins.testreport;
 import com.aventstack.kinsjen.api.credential.Credential;
 import com.aventstack.kinsjen.api.credential.CredentialService;
 import com.aventstack.kinsjen.api.external.jenkins.JenkinsPath;
-import com.aventstack.kinsjen.api.external.jenkins.job.Job;
 import com.aventstack.kinsjen.api.pipeline.Pipeline;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
@@ -33,7 +32,8 @@ public class JenkinsTestReportService {
             cred.ifPresent(value -> headers.setBasicAuth(value.getUsername(), value.getApiToken()));
         }
 
-        final ResponseEntity<TestReportEntity> responseEntity = restTemplate.exchange(url, HttpMethod.GET, new HttpEntity<>(headers), TestReportEntity.class);
+        final ResponseEntity<TestReportEntity> responseEntity = restTemplate.exchange(url, HttpMethod.GET,
+                new HttpEntity<>(headers), TestReportEntity.class);
         return responseEntity.getBody();
     }
 }

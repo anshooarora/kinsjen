@@ -3,12 +3,15 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
 import { Breadcrumb } from '../../model/breadcrumb.model';
 import { BreadcrumbService } from '../../services/breadcrumb.service';
-import { AutomationServer } from '../../model/automation-server.model';
-import { AutomationServerService } from '../../services/automation-server.service';
-import { AuthToken } from '../../model/auth-token.model';
+import { JenkinsInstance } from '../../model/jenkins-instance.model';
+import { JenkinsInstanceService } from '../../services/jenkins-instance.service';
+import { Credential } from '../../model/credential.model';
 import { Page } from '../../model/page.model';
 import { Org } from '../../model/org.model';
 import { OrgService } from '../../services/org.service';
+import { JenkinsConnectionService } from '../../services/jenkins-connection.service';
+import { CredentialService } from '../../services/credential.service';
+import { ConnectionTestResponse } from '../../model/connection-test-response.model';
 
 @Component({
   selector: 'app-start',
@@ -33,28 +36,33 @@ export class StartComponent implements OnInit {
   orgs: Page<Org> | undefined;
   org: Org = new Org();
 
-  /* automation-server */
-  automationServer: AutomationServer = {
+  /* jenkins instance */
+  jenkinsInstance: JenkinsInstance = {
     id: 0,
-    authTokens: [],
     name: '',
     url: '',
     type: 'Jenkins'
   };
-  authToken: AuthToken = new AuthToken();
-  automationServerPage: Page<AutomationServer> = new Page();
+  credential: Credential = new Credential();
+  automationServerPage: Page<JenkinsInstance> = new Page();
+
+  /* test connection */
+  isConnValid: boolean = false;
 
   
   constructor(private route: ActivatedRoute, 
     private router: Router,
     private breadcrumbService: BreadcrumbService,
     private orgService: OrgService,
-    private automationServerService: AutomationServerService) { }
+    private jenkinsInstanceService: JenkinsInstanceService,
+    private credentialService: CredentialService,
+    private jenkinsConnectionService: JenkinsConnectionService) { }
 
   ngOnInit(): void {
+    console.log('starting...')
     this.setBreadcrumb();
     this.findOrgs();
-    this.findAutomationServers();
+    this.findJenkinsInstances();
   }
 
   ngOnDestroy(): void {
@@ -98,12 +106,13 @@ export class StartComponent implements OnInit {
       });
   }
 
-  findAutomationServers(): void {
-    this.automationServerService.findAll(0)
+  findJenkinsInstances(): void {
+    this.jenkinsInstanceService.findAll(0)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
-        next: (response: Page<AutomationServer>) => {
+        next: (response: Page<JenkinsInstance>) => {
           this.automationServerPage = response;
+          console.log(response)
           if (response.totalElements > 0) {
             this.router.navigate(['/orgs', this.orgs?.content![0].name]);
           }
@@ -114,17 +123,37 @@ export class StartComponent implements OnInit {
       });
   }
 
-  saveAutomationServer(): void {
-    this.automationServer.authTokens = [];
-    if (this.authToken.name && this.authToken.token) {
-      this.automationServer.authTokens.push(this.authToken);
-    }
-
-    this.automationServerService.save(this.automationServer)
+  testConnection(): void {
+    this.error = undefined;
+    this.jenkinsConnectionService.testConnection(this.jenkinsInstance, this.credential)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
-        next: () => {
-          this.router.navigate(['/orgs', this.orgs?.content![0].name]);
+        next: (response: ConnectionTestResponse) => {
+          this.isConnValid = response.valid;
+        },
+        error: (err) => {
+          this.error = JSON.stringify(err);
+        }
+      });
+  }
+
+  save(): void {
+    this.jenkinsInstanceService.save(this.jenkinsInstance)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (jenkinsInstance: JenkinsInstance) => {
+          console.log(jenkinsInstance);
+          this.credential.jenkinsInstanceId = jenkinsInstance.id;
+          this.credentialService.save(this.credential)
+            .pipe(takeUntil(this.destroy$))
+            .subscribe({
+              next: (cred) => {
+                console.log(cred);
+              },
+              error: (err) => {
+                this.error = JSON.stringify(err);
+              }
+            })
         },
         error: (err) => {
           this.error = JSON.stringify(err);
@@ -133,9 +162,9 @@ export class StartComponent implements OnInit {
   }
 
   enableAddPipelines(): boolean {
-    return this.automationServer.name != '' && this.automationServer.url != ''
-      && (this.authToken.name == '' && this.authToken.token == '' ||
-        this.authToken.name != '' && this.authToken.token != '');
+    return this.jenkinsInstance.name != '' && this.jenkinsInstance.url != ''
+      && (this.credential.name == '' && this.credential.apiToken == '' ||
+        this.credential.name != '' && this.credential.apiToken != '');
   }
 
 }

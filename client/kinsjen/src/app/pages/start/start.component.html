@@ -20,7 +20,7 @@
             <!-- org ready msg -->
             <div class="alert bg-success p-5 text-light" *ngIf="orgs?.totalElements && org.name">
                 <div class="d-flex flex-column pe-0 pe-sm-10">
-                    <h5 class="mb-2 text-light">Your first org, {{ org.name }} is ready!</h5>
+                    <h5 class="mb-2 text-light">Your first org {{ org.name }} is ready!</h5>
                 </div>
             </div>
 
@@ -60,9 +60,9 @@
                         </div>
                         <div class="col-9">
                             <div class="input-group input-group-solid">
-                                <input type="text" class="form-control" [(ngModel)]="automationServer.name" placeholder="server-name" style="max-width: 30%;" />
+                                <input type="text" class="form-control" [(ngModel)]="jenkinsInstance.name" placeholder="server-name" style="max-width: 25%;" />
                                 <span class="input-group-text"></span>
-                                <input type="text" class="form-control" [(ngModel)]="automationServer.url" placeholder="https://localhost/" />
+                                <input type="text" class="form-control" [(ngModel)]="jenkinsInstance.url" placeholder="https://localhost/" />
                             </div>
                         </div>
                     </div>
@@ -72,17 +72,21 @@
                         </div>
                         <div class="col-9">
                             <div class="input-group input-group-solid">
-                                <input type="text" class="form-control" [(ngModel)]="authToken.name" placeholder="token-name" style="max-width: 30%;" />
+                                <input type="text" class="form-control" [(ngModel)]="credential.name" placeholder="name" style="max-width: 25%;" />
                                 <span class="input-group-text"></span>
-                                <input type="text" class="form-control" [(ngModel)]="authToken.token" placeholder="token"/>
+                                <input type="text" class="form-control" [(ngModel)]="credential.username" placeholder="user" style="max-width: 25%;"/>
+                                <span class="input-group-text"></span>
+                                <input type="password" class="form-control" [(ngModel)]="credential.apiToken" placeholder="apiToken"/>
                             </div>
                         </div>
                     </div>
                     <div class="row text-end">
                         <div class="col-xl-3"></div>
                         <div class="col-xl-9">
+                            <button type="submit" class="btn btn-primary mt-4 me-2" 
+                                [disabled]="!enableAddPipelines()" (click)="testConnection()">Test connection</button>
                             <button type="submit" class="btn btn-primary mt-4" 
-                                [disabled]="!enableAddPipelines()" (click)="saveAutomationServer()">Start adding pipelines</button>
+                                [disabled]="!isConnValid" (click)="save()">Save Jenkins</button>
                         </div>
                     </div>
                 </div>

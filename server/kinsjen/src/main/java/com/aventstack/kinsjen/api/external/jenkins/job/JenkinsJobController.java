@@ -22,7 +22,7 @@ public class JenkinsJobController {
     private PipelineService pipelineService;
 
     @GetMapping
-    public ResponseEntity<?> findAll(@RequestParam(defaultValue = "-1") final int jenkinsInstanceId,
+    public ResponseEntity<?> find(@RequestParam(defaultValue = "-1") final int jenkinsInstanceId,
             @RequestParam(defaultValue = "-1") final int credentialId,
             @RequestParam(defaultValue = "false") final boolean recursive) {
         if (0 >= jenkinsInstanceId) {

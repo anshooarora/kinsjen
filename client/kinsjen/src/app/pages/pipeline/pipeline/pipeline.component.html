@@ -1,0 +1,67 @@
+<div class="content d-flex flex-column flex-column-fluid h-100 mt-5" *ngIf="jenkinsJob">
+    <div class="container-xxl h-100">
+        <div class="d-flex flex-column flex-lg-row h-100">
+            <div class="flex-column flex-lg-row-auto w-350px mb-10 mt-6 mb-lg-0">
+                <h3 class="mb-1">{{ jenkinsJob.fullName }}</h3>
+                <p class="text-muted">Jenkins</p>
+
+                <ul class="text-sm ps-0 mt-10" style="list-style: none; max-width: 250px;">
+                    <li class="fw-semibold my-2 p-3 rounded" [ngClass]="{ 'bg-primary bg-opacity-10 text-info': build.number == currentBuildNumber }" *ngFor="let build of jenkinsJob.builds">
+                        <a href="javascript:void(0);" class="text-muted">
+                            <span class="me-2"><i [ngClass]="{ 'text-danger': build.result == 'FAILURE' }" class="bi bi-caret-right-square"></i></span>
+                            <span>Build {{ build.number }}</span>
+                        </a>
+                        <span class="spinner-border spinner-border-sm align-middle ms-2" *ngIf="build.building || build.inProgress"></span>
+                    </li>
+                </ul>
+            </div>
+            
+            <div class="flex-lg-row-fluid">
+                <div class="card card-flush h-100 hover-scroll-y">
+                    <div class="card-header mb-10">
+                        <!--<div class="d-flex justify-content-center flex-column pt-5">
+                            <a href="#" class="fs-4 fw-bold text-gray-900 text-hover-primary">
+                                Build {{ currentBuildNumber }}
+                            </a>
+                            <div *ngIf="selectedBuild && buildDetails" class="mt-1 ms-n1">
+                                <span class="badge me-1" [ngClass]="'status-' + selectedBuild.result.toLowerCase()" *ngIf="selectedBuild">{{ selectedBuild.result }}</span>
+                                &middot;
+                                <span class="badge badge-light-success me-1" *ngIf="buildDetails">{{ buildDetails!.childReports![0].result!.passCount }}</span>
+                                <span class="badge badge-light-danger me-1" *ngIf="buildDetails">{{ buildDetails!.childReports![0].result!.failCount }}</span>
+                                <span class="badge badge-light-warning me-1" *ngIf="buildDetails">{{ buildDetails!.childReports![0].result!.skipCount }}</span>
+                                &middot;
+                                <span class="badge badge-light" *ngIf="selectedBuild">Duration {{ selectedBuild.duration }}</span>
+                            </div>
+                        </div>-->
+                    </div>
+                    
+                    <div class="card-body scroll-y">
+                        <div class="alert alert-danger bg-light-danger border border-danger border-dashed p-5" *ngIf="error">
+                            {{ error }}
+                        </div>
+
+                        <!--<div class="table-responsive" *ngIf="buildDetails">
+                            <table class="table table-row-dashed table-row-gray-300 gy-3">
+                                <thead>
+                                    <tr class="fw-bold fs-7 text-gray-800">
+                                        <th>Name</th>
+                                        <th>Duration (s)</th>
+                                        <th>Last Failed</th>
+                                        <th>Status</th>
+                                </thead>
+                                <tbody>
+                                    <tr *ngFor="let test of buildDetails!.childReports![0]!.result!.suites![0]!.cases!">
+                                        <td class="ff-monospace">{{ test.name }}</td>
+                                        <td><span class="badge badge-light">{{ test.duration }}</span></td>
+                                        <td>{{ test.failedSince == 0 ? 'Never' : test.failedSince }}</td>
+                                        <td><span class="badge" [ngClass]="'status-' + test.status!.toLowerCase()">{{ test.status }}</span></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>-->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>	
+</div>

@@ -1,3 +1,61 @@
 <div class="container">
-        
+    <div class="row">
+      <div class="col-12 mb-10">
+          <div class="align-center text-center">
+              <h1><i class="bi bi-building-gear fs-1 text-primary"></i></h1>
+              <h1 class="fw-semibold">Pipelines</h1>
+              <p>
+                <a routerLink="." (click)="activeView = 0" *ngIf="activeView != 0">Listing</a>
+                <a routerLink="." (click)="activeView = 1" *ngIf="activeView != 1">Metrics</a> &middot;  
+                <a routerLink="/new">Add pipelines</a>
+              </p>
+              <p class="mb-5" *ngIf="activeView == 0">Listing of all pipelines for extent-framework org</p>
+              
+              <div class="input-group w-450px mx-auto" *ngIf="activeView == 0">
+                  <span class="input-group-text" id="search-pipelines"><i class="bi bi-search"></i></span>
+                  <input type="text" class="form-control" placeholder="Find a pipeline...">
+              </div>
+          </div>
+      </div>
+  </div>
+
+  <div id="chart" *ngIf="activeView == 1">
+    <apx-chart
+        [series]="chartOptions.series"
+        [chart]="chartOptions.chart"
+        [dataLabels]="chartOptions.dataLabels"
+        [plotOptions]="chartOptions.plotOptions"
+        [stroke]="chartOptions.stroke"
+        [title]="chartOptions.title"
+        [xaxis]="chartOptions.xaxis"
+        [tooltip]="chartOptions.tooltip">
+    </apx-chart>
+  </div>
+
+  <div class="row" *ngIf="pipelinePage && 0 < pipelinePage.totalElements && activeView == 0">
+    <div class="col-8 offset-2">
+        <div class="row">
+            <div class="col-6 mb-5" *ngFor="let pipeline of pipelinePage.content">
+                <div class="card card-flush">
+                    <div class="card-header">
+                        <h3 class="card-title align-items-start flex-column">
+                            <a class="card-label fw-semibold text-gray-900 fs-5" [routerLink]="['pipelines', pipeline.id]">{{ pipeline.name }}</a>
+                            <span class="text-gray-500 mt-1 fw-semibold fs-7">{{ pipeline._class }}</span>
+                        </h3>
+                    </div>
+                    <div class="card-body pt-5">
+                        <div class="d-flex flex-stack">
+                            <div>
+                                <span><i class="bi bi-check-circle text-success text-xs"></i> &nbsp;#12</span>
+                            </div>
+                            <div class="text-muted fw-semibold">
+                                <span><i class="bi bi-clock"></i> 9s</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </div>
