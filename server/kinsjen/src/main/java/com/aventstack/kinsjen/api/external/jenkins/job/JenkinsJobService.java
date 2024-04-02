@@ -25,7 +25,6 @@ import java.util.stream.Collectors;
 public class JenkinsJobService {
 
     private static final Logger log = LoggerFactory.getLogger(JenkinsJobService.class);
-    private static final short DEPTH = 1;
 
     @Autowired
     private RestTemplate restTemplate;
@@ -36,23 +35,33 @@ public class JenkinsJobService {
     @Autowired
     private CredentialService credentialService;
 
-    public List<Job> findAllJobs(final int jenkinsInstanceId, final int credentialId, final boolean recursive) {
+    public List<Job> findAllJobs(final int jenkinsInstanceId,
+                                 final int credentialId,
+                                 final int depth,
+                                 final boolean recursive) {
         final JenkinsInstance jenkinsInstance = jenkinsCommonsService.findInstance(jenkinsInstanceId);
         final Optional<Credential> credential = credentialService.findById(credentialId);
-        return findAllJobs(jenkinsInstance, credential, recursive);
+        return findAllJobs(jenkinsInstance, credential, depth, recursive);
     }
 
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
-    public List<Job> findAllJobs(final JenkinsInstance jenkinsInstance, final Optional<Credential> cred, final boolean recursive) {
+    public List<Job> findAllJobs(final JenkinsInstance jenkinsInstance,
+                                 final Optional<Credential> cred,
+                                 final int depth,
+                                 final boolean recursive) {
         final HttpHeaders headers = new HttpHeaders();
         //headers.setBasicAuth("anshoo", "11aa31fbf6109218aefc691b1546f6ce4c");
         cred.ifPresent(value -> headers.setBasicAuth(value.getUsername(), value.getApiToken()));
-        return findJobs(jenkinsInstance.getUrl(), headers, new ArrayList<>(), recursive);
+        return findJobs(jenkinsInstance.getUrl(), headers, new ArrayList<>(), depth, recursive);
     }
 
-    private List<Job> findJobs(final String baseUrl, final HttpHeaders headers, final List<Job> jobs, final boolean recurse) {
+    private List<Job> findJobs(final String baseUrl,
+                               final HttpHeaders headers,
+                               final List<Job> jobs,
+                               final int depth,
+                               final boolean recurse) {
         log.debug("Retrieving job listing from URL " + baseUrl);
-        final String url = baseUrl + JenkinsPath.API_JSON;
+        final String url = baseUrl + JenkinsPath.API_JSON + "?depth=" + depth;
         final ResponseEntity<JobListingEntity> responseEntity = restTemplate.exchange(url, HttpMethod.GET,
                 new HttpEntity<>(headers), JobListingEntity.class);
         final JobListingEntity jobListing = responseEntity.getBody();
@@ -67,16 +76,16 @@ public class JenkinsJobService {
             jobs.addAll(jobList);
             if (recurse) {
                 for (final Job job : folders) {
-                    return findJobs(job.getUrl(), headers, jobs, true);
+                    return findJobs(job.getUrl(), headers, jobs, depth, true);
                 }
             }
         }
         return jobs;
     }
 
-    public Job findJob(final Pipeline pipeline) {
+    public Job findJob(final Pipeline pipeline, final int depth) {
         final String uri = pipeline.getUrl() + JenkinsPath.API_JSON;
-        final String url = JenkinsPath.withDepth(DEPTH, uri);
+        final String url = JenkinsPath.withDepth(depth, uri);
         final HttpHeaders headers = new HttpHeaders();
 
         if (0 < pipeline.getCredentialId()) {

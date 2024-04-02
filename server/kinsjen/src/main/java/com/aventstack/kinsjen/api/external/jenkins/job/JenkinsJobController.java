@@ -24,18 +24,20 @@ public class JenkinsJobController {
     @GetMapping
     public ResponseEntity<?> find(@RequestParam(defaultValue = "-1") final int jenkinsInstanceId,
             @RequestParam(defaultValue = "-1") final int credentialId,
+            @RequestParam(defaultValue = "0") final int depth,
             @RequestParam(defaultValue = "false") final boolean recursive) {
         if (0 >= jenkinsInstanceId) {
             return ResponseEntity.badRequest().body("Invalid Jenkins instance ID specified: " + jenkinsInstanceId);
         }
-        return ResponseEntity.ok(service.findAllJobs(jenkinsInstanceId, credentialId, recursive));
+        return ResponseEntity.ok(service.findAllJobs(jenkinsInstanceId, credentialId, depth, recursive));
     }
 
     @GetMapping("/{pipelineId}")
-    public ResponseEntity<?> find(@PathVariable final long pipelineId) {
+    public ResponseEntity<?> find(@PathVariable final long pipelineId,
+                                  @RequestParam(defaultValue = "0") final int depth) {
         final Pipeline pipeline = pipelineService.findById(pipelineId).orElseThrow(() ->
                 new PipelineNotFoundException("Unable to find a matching pipeline with pipelineId " + pipelineId));
-        return ResponseEntity.ok(service.findJob(pipeline));
+        return ResponseEntity.ok(service.findJob(pipeline, depth));
     }
 
 }
