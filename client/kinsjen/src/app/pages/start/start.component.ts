@@ -33,7 +33,7 @@ export class StartComponent implements OnInit {
   error: string | undefined;
 
   /* org */
-  orgs: Page<Org> | undefined;
+  orgs: Page<Org>;
   org: Org = new Org();
 
   /* jenkins instance */
@@ -114,7 +114,7 @@ export class StartComponent implements OnInit {
           this.automationServerPage = response;
           console.log(response)
           if (response.totalElements > 0) {
-            this.router.navigate(['/orgs', this.orgs?.content![0].name]);
+            this.router.navigate(['orgs']);
           }
         },
         error: (err) => {

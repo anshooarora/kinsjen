@@ -12,16 +12,16 @@ export class JenkinsJob {
     buildable: boolean;
     builds: JenkinsBuild[];
     color: string;
-    firstBuild: any;
+    firstBuild: JenkinsBuild;
     inQueue: boolean;
     keepDependencies: boolean;
-    lastBuild: any;
-    lastCompletedBuild: any;
-    lastFailedBuild: any;
-    lastStableBuild: any;
-    lastSuccessfulBuild: any;
-    lastUnstableBuild: any;
-    lastUnsuccessfulBuild: any;
+    lastBuild: JenkinsBuild;
+    lastCompletedBuild: JenkinsBuild;
+    lastFailedBuild: JenkinsBuild;
+    lastStableBuild: JenkinsBuild;
+    lastSuccessfulBuild: JenkinsBuild;
+    lastUnstableBuild: JenkinsBuild;
+    lastUnsuccessfulBuild: JenkinsBuild;
     nextBuildNumber: number;
     concurrentBuild: boolean;
 

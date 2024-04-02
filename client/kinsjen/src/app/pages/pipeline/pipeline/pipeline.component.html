@@ -6,7 +6,10 @@
                 <p class="text-muted">Jenkins</p>
 
                 <ul class="text-sm ps-0 mt-10" style="list-style: none; max-width: 250px;">
-                    <li class="fw-semibold my-2 p-3 rounded" [ngClass]="{ 'bg-primary bg-opacity-10 text-info': build.number == currentBuildNumber }" *ngFor="let build of jenkinsJob.builds">
+                    <li class="fw-semibold my-2 p-3 rounded" 
+                        [ngClass]="{ 'bg-primary bg-opacity-10 text-info': build.number == currentBuildNumber }" 
+                        *ngFor="let build of jenkinsJob.builds"
+                        (click)="findBuildDetails(build.number)">
                         <a href="javascript:void(0);" class="text-muted">
                             <span class="me-2"><i [ngClass]="{ 'text-danger': build.result == 'FAILURE' }" class="bi bi-caret-right-square"></i></span>
                             <span>Build {{ build.number }}</span>
@@ -19,20 +22,20 @@
             <div class="flex-lg-row-fluid">
                 <div class="card card-flush h-100 hover-scroll-y">
                     <div class="card-header mb-10">
-                        <!--<div class="d-flex justify-content-center flex-column pt-5">
+                        <div class="d-flex justify-content-center flex-column pt-5">
                             <a href="#" class="fs-4 fw-bold text-gray-900 text-hover-primary">
-                                Build {{ currentBuildNumber }}
+                                Build {{ currentBuildNumber }} <span class="spinner-border spinner-border-sm align-middle ms-2" *ngIf="loading"></span>
                             </a>
-                            <div *ngIf="selectedBuild && buildDetails" class="mt-1 ms-n1">
-                                <span class="badge me-1" [ngClass]="'status-' + selectedBuild.result.toLowerCase()" *ngIf="selectedBuild">{{ selectedBuild.result }}</span>
+                            <div *ngIf="testReport.totalCount > 0" class="mt-1 ms-n1">
+                                <span class="badge me-1" [ngClass]="'status-' + currentBuild.result.toLowerCase()">{{ currentBuild.result }}</span>
                                 &middot;
-                                <span class="badge badge-light-success me-1" *ngIf="buildDetails">{{ buildDetails!.childReports![0].result!.passCount }}</span>
-                                <span class="badge badge-light-danger me-1" *ngIf="buildDetails">{{ buildDetails!.childReports![0].result!.failCount }}</span>
-                                <span class="badge badge-light-warning me-1" *ngIf="buildDetails">{{ buildDetails!.childReports![0].result!.skipCount }}</span>
+                                <span class="badge badge-light-success me-1">{{ testReport.totalCount - testReport.failCount + testReport.skipCount }}</span>
+                                <span class="badge badge-light-danger me-1">{{ testReport.failCount }}</span>
+                                <span class="badge badge-light-warning me-1">{{ testReport.skipCount }}</span>
                                 &middot;
-                                <span class="badge badge-light" *ngIf="selectedBuild">Duration {{ selectedBuild.duration }}</span>
+                                <span class="badge badge-light">Duration {{ testReport.childReports[0].result.duration }}</span>
                             </div>
-                        </div>-->
+                        </div>
                     </div>
                     
                     <div class="card-body scroll-y">
@@ -40,7 +43,7 @@
                             {{ error }}
                         </div>
 
-                        <!--<div class="table-responsive" *ngIf="buildDetails">
+                        <div class="table-responsive" *ngIf="testReport.totalCount > 0">
                             <table class="table table-row-dashed table-row-gray-300 gy-3">
                                 <thead>
                                     <tr class="fw-bold fs-7 text-gray-800">
@@ -50,7 +53,7 @@
                                         <th>Status</th>
                                 </thead>
                                 <tbody>
-                                    <tr *ngFor="let test of buildDetails!.childReports![0]!.result!.suites![0]!.cases!">
+                                    <tr *ngFor="let test of testReport.childReports[0].result.suites[0].cases">
                                         <td class="ff-monospace">{{ test.name }}</td>
                                         <td><span class="badge badge-light">{{ test.duration }}</span></td>
                                         <td>{{ test.failedSince == 0 ? 'Never' : test.failedSince }}</td>
@@ -58,7 +61,12 @@
                                     </tr>
                                 </tbody>
                             </table>
-                        </div>-->
+                        </div>
+
+                        <pre *ngIf="consoleText">
+<!-- do not move the below mustache / <pre> indentation -->
+{{ consoleText }}
+                        </pre>
                     </div>
                 </div>
             </div>

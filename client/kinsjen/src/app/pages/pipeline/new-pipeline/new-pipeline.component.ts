@@ -122,7 +122,7 @@ export class NewPipelineComponent implements OnInit {
     this.jenkinsJobs = this.error = undefined;
     console.log(this.hostSelection)
 
-    this.jenkinsJobsService.findJobs(this.hostSelection.id, this.credentialSelection.id, true)
+    this.jenkinsJobsService.findJobs(this.hostSelection.id, this.credentialSelection.id, 0, true)
       .pipe(takeUntil(this._unsubscribe), finalize(() => { 
         this.loading = false;
       }))

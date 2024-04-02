@@ -1,7 +1,7 @@
 import { Case } from "./case.model";
 
 export class Suite {
-    case: Case[];
+    cases: Case[];
     duration: number;
     id: string;
     name: string;
