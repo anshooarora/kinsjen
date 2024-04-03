@@ -37,12 +37,15 @@ export class NewPipelineComponent implements OnInit {
 
   /* jenkins */
   jenkinsParams: JenkinsParams = new JenkinsParams();
-  jenkinsJobs: JenkinsJob[] | undefined;
+  jenkinsJobs: JenkinsJob[];
 
   /* credentials */
   credentials: Page<Credential> = new Page<Credential>();
   credentialSelection: Credential = new Credential();
 
+  /* pipeline */
+  pipelinePage: Page<Pipeline>;
+  pipelineURLs: string[];
 
   constructor(private route: ActivatedRoute, 
     private orgService: OrgService,
@@ -74,6 +77,25 @@ export class NewPipelineComponent implements OnInit {
         this.error = JSON.stringify(err);
       }
     })
+  }
+
+  findPipelines(org: Org): void {
+    console.log(org)
+    this.pipelineService.findAll(org.id)
+      .pipe(takeUntil(this._unsubscribe), finalize(() => { 
+        this.loading = false;
+      }))
+      .subscribe({
+        next: (response: Page<Pipeline>) => {
+          console.log(response);
+          this.pipelinePage = response;
+          this.pipelineURLs = this.pipelinePage.content.map(x => x.url.replace(/\/$/, ''));
+          console.log(this.pipelineURLs);
+        },
+        error: (err) => {
+          this.error = JSON.stringify(err);
+        }
+      });
   }
 
   findJenkinsInstance(): void {
@@ -119,8 +141,8 @@ export class NewPipelineComponent implements OnInit {
 
   discoverPipelines(): void {
     this.loading = true;
-    this.jenkinsJobs = this.error = undefined;
-    console.log(this.hostSelection)
+    this.error = undefined;
+    this.jenkinsJobs = [];
 
     this.jenkinsJobsService.findJobs(this.hostSelection.id, this.credentialSelection.id, 0, true)
       .pipe(takeUntil(this._unsubscribe), finalize(() => { 
@@ -128,7 +150,8 @@ export class NewPipelineComponent implements OnInit {
       }))
       .subscribe({
         next: (response: JenkinsJob[]) => {
-          this.jenkinsJobs = response;
+          const jobs = response.filter(x => !this.pipelineURLs.includes(x.url.replace(/\/$/, '')));
+          this.jenkinsJobs = jobs;
           this.condenseContent = true;
           console.log(response)
         },
@@ -136,6 +159,17 @@ export class NewPipelineComponent implements OnInit {
           this.error = JSON.stringify(err);
         }
       });
+  }
+
+  discoverPipelinesBtnEnabled(): boolean {
+    return this.orgSelection.id > 0 && this.hostSelection.name != '';
+  }
+
+  saveBtnEnabled(): boolean {
+    console.log(this.orgSelection)
+    return this.jenkinsJobs.length > 0 &&
+      this.jenkinsJobs.some(x => x.checked) &&
+      this.orgSelection.id > 0;
   }
 
   save(): void {

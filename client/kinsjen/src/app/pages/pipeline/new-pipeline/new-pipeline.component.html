@@ -17,9 +17,9 @@
                                 <div class="fw-semibold mt-2 mb-3">Org</div>
                             </div>
                             <div class="col-9">
-                                <select [(ngModel)]="orgSelection.name" class="form-select form-select-solid" aria-label="Select Org">
-                                    <option disabled>Select Org</option>
-                                    <option *ngFor="let org of orgs.content">{{ org.name }}</option>
+                                <select [(ngModel)]="orgSelection.id" (change)="findPipelines(orgSelection)" class="form-select form-select-solid" aria-label="Select Org">
+                                    <option disabled selected value>Select Org</option>
+                                    <option *ngFor="let org of orgs.content" [value]="org.id">{{ org.name }}</option>
                                 </select>
                             </div>
                         </div>
@@ -30,7 +30,7 @@
                             <div class="col-9">
                                 <select [(ngModel)]="hostSelection.name" (change)="jenkinsInstanceChanged($event)"
                                     class="form-select form-select-solid" aria-label="Select host">
-                                    <option disabled>Select host</option>
+                                    <option disabled selected value>Select host</option>
                                     <option *ngFor="let ji of jenkinsInstance.content">{{ ji.name }}</option>
                                 </select>
                             </div>
@@ -50,14 +50,20 @@
                         <div class="row text-end">
                             <div class="col-xl-3"></div>
                             <div class="col-xl-9">
-                                <button type="submit" class="btn btn-primary mt-4" (click)="discoverPipelines()">Discover pipelines</button>
+                                <button type="submit" class="btn btn-primary mt-4" [disabled]="!discoverPipelinesBtnEnabled()"
+                                    (click)="discoverPipelines()">Discover pipelines</button>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div class="card mt-5" *ngIf="jenkinsJobs">
+            <div class="mt-5 alert alert-danger bg-light-danger border border-danger border-dashed d-flex align-items-center p-5" 
+                *ngIf="jenkinsJobs && !jenkinsJobs.length">
+                <p class="mb-0">Looks like all jobs of host <span class="fw-bold">{{ hostSelection.name }}</span> have either been added or no jobs were found.</p>
+            </div>
+
+            <div class="card mt-5" *ngIf="jenkinsJobs && jenkinsJobs.length">
                 <div class="card-header align-items-center">
                     <h3 class="fw-semibold text-gray-900 m-0">Pipelines</h3>
                     <div class="card-toolbar"><span class="badge badge-primary">{{ jenkinsJobs.length }}</span></div>
@@ -77,9 +83,13 @@
                         </div>
                     </div>
                 </div>
-                <div class="card-footer d-flex justify-content-end py-5">
-                    <button type="submit" class="btn btn-primary" (click)="save()">Save</button>
+                <div class="card-footer d-flex justify-content-end py-5 align-middle">
+                    <button type="submit" class="btn btn-primary" (click)="save()" [disabled]="!saveBtnEnabled()">Save</button>
                 </div>
+            </div>
+
+            <div class="alert alert-danger bg-light-danger border border-danger border-dashed d-flex align-items-center p-5" *ngIf="error">
+                {{ error }}
             </div>
         </div>
     </div>
