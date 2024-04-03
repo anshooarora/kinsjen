@@ -1,7 +1,15 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Subject, finalize, takeUntil } from 'rxjs';
-import { ApexAxisChartSeries, ApexTitleSubtitle, ApexDataLabels, ApexChart, ApexPlotOptions, ChartComponent } from "ng-apexcharts";
+import { ApexAxisChartSeries, 
+  ApexTitleSubtitle, 
+  ApexDataLabels, 
+  ApexChart, 
+  ApexPlotOptions, 
+  ChartComponent,
+  ApexXAxis,
+  ApexStroke,
+  ApexGrid } from "ng-apexcharts";
 import { Breadcrumb } from '../../../model/breadcrumb.model';
 import { BreadcrumbService } from '../../../services/breadcrumb.service';
 import { JenkinsInstance } from '../../../model/jenkins-instance.model';
@@ -21,6 +29,9 @@ export type ChartOptions = {
   dataLabels: ApexDataLabels;
   title: ApexTitleSubtitle;
   plotOptions: ApexPlotOptions;
+  xaxis: ApexXAxis;
+  grid: ApexGrid;
+  stroke: ApexStroke;
 };
 
 @Component({
@@ -30,6 +41,8 @@ export type ChartOptions = {
 })
 export class OrgComponent implements OnInit {
   
+  Math = Math;
+
   private destroy$: Subject<any> = new Subject<any>();
   private readonly componentTitle: string = 'Orgs';
   private readonly breadcrumbs: Breadcrumb[] = [
@@ -53,6 +66,9 @@ export class OrgComponent implements OnInit {
   /* pipelines */
   pipelinePage: Page<Pipeline>;
 
+  /* jenkins jobs */
+  jenkinsJobs: JenkinsJob[] = [];
+
   /* jenkins */
   newJenkinsInstance: JenkinsInstance = {
     id: 0,
@@ -67,8 +83,13 @@ export class OrgComponent implements OnInit {
   activeView: ActiveView = ActiveView.Listing;
 
   /* heatmap */
-  @ViewChild("chart") chart: ChartComponent;
-  public chartOptions: Partial<ChartOptions> | any;
+  @ViewChild("heatmap") chart: ChartComponent;
+  public heatmapOptions: Partial<ChartOptions> | any;
+
+  /* line chart */
+  @ViewChild("line") lineChart: ChartComponent;
+  public lineChartOptions: Partial<ChartOptions> | any;
+  lineChartData: any = [];
 
 
   constructor(private route: ActivatedRoute, 
@@ -81,7 +102,7 @@ export class OrgComponent implements OnInit {
     this.setBreadcrumb();
     this.findPipelines();
 
-    this.chartOptions = {
+    this.heatmapOptions = {
       tooltip: {
         custom: function(opts: any): any {
           const desc = opts.ctx.w.config.series[opts.seriesIndex].data[opts.dataPointIndex].description;
@@ -122,25 +143,25 @@ export class OrgComponent implements OnInit {
               {
                 from: 0,
                 to: 0,
-                name: "SUCCESS",
+                name: "success",
                 color: "#00A100"
               },
               {
                 from: 9,
                 to: 9,
-                name: "NODATA",
+                name: "not run",
                 color: "#CCCCCC"
               },
               {
                 from: 2,
                 to: 2,
-                name: "UNSTABLE",
+                name: "unstable",
                 color: "#FFB200"
               },
               {
                 from: 1,
                 to: 1,
-                name: "FAILURE",
+                name: "failure",
                 color: "#FF0000"
               }
             ]
@@ -152,6 +173,39 @@ export class OrgComponent implements OnInit {
       },
       title: {
         text: ""
+      }
+    };
+
+    this.lineChartOptions = {
+      series: [
+        {
+          name: "",
+          data: []
+        }
+      ],
+      chart: {
+        height: 250,
+        type: "line",
+        zoom: {
+          enabled: false
+        }
+      },
+      dataLabels: {
+        enabled: false
+      },
+      stroke: {
+        curve: "straight"
+      },
+      title: {
+      },
+      grid: {
+        row: {
+          colors: ["#f3f3f3", "transparent"], // takes an array which will be repeated on columns
+          opacity: 0.5
+        }
+      },
+      xaxis: { 
+        categories: [ ]
       }
     };
   }
@@ -184,25 +238,6 @@ export class OrgComponent implements OnInit {
       });
   }
 
-  saveAutomationServer(): void {
-    //this.newJenkinsInstance.authTokens = [];
-    if (this.credential.name && this.credential.apiToken) {
-      //this.newJenkinsInstance.authTokens.push(this.credential);
-    }
-    this.jenkinsInstanceService.save(this.newJenkinsInstance)
-      .pipe(takeUntil(this.destroy$), finalize(() => { 
-        this.loading = false;
-      }))
-      .subscribe({
-        next: (response: any) => {
-          
-        },
-        error: (err) => {
-          this.error = JSON.stringify(err);
-        }
-      });
-  }
-
   findPipelines(): void {
     this.org = new Org(); 
     this.org.id = 1;
@@ -215,7 +250,7 @@ export class OrgComponent implements OnInit {
       next: (response: Page<Pipeline>) => {
         console.log(response);
         this.pipelinePage = response;
-        this.createChart();
+        this.createHeatmap();
       },
       error: (err) => {
         this.error = JSON.stringify(err);
@@ -223,16 +258,20 @@ export class OrgComponent implements OnInit {
     });
   }
 
-  createChart(): void {
+  createHeatmap(): void {
     const series: any[] = [];
-    this.chartOptions.chart.height = this.pipelinePage.totalElements * 70;
+    this.heatmapOptions.chart.height = this.pipelinePage.totalElements * 70;
     for (let pipeline of this.pipelinePage.content) {
-      this.jenkinsJobsService.findJob(pipeline.id)
+      this.jenkinsJobsService.findJob(pipeline.id, 1)
         .pipe(takeUntil(this.destroy$), finalize(() => { 
+          this.createPerfLine();
           this.loading = false;
         }))
         .subscribe({
           next: (response: JenkinsJob) => {
+            response.pipeline = pipeline;
+            this.jenkinsJobs.push(response);
+            console.log(response)
             const seriesData: any = {
               name: response.displayName,
               data: []
@@ -254,7 +293,7 @@ export class OrgComponent implements OnInit {
               }
               seriesData.data.push(data);
             }
-            this.chartOptions.series = series;
+            this.heatmapOptions.series = series;
           },
           error: (err) => {
             this.error = JSON.stringify(err);
@@ -277,4 +316,22 @@ export class OrgComponent implements OnInit {
     return 'NODATA';
   }
 
+  createPerfLine(): void {
+    this.lineChartData = [];
+    for (let job of this.jenkinsJobs) {
+      this.lineChartData.push({
+        title: {
+          text: job.name
+        },
+        series: [{
+          name: 'time (s)',
+          data: job.builds.flatMap(x => Math.trunc(x.duration/1000))
+        }],
+        xaxis: {
+          categories: job.builds.map(x => x.number)
+        }
+      });
+      console.log(this.lineChartData)
+    }
+  }
 }

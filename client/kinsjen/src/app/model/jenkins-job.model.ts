@@ -1,4 +1,5 @@
 import { JenkinsBuild } from "./jenkins-build.model";
+import { Pipeline } from "./pipeline.model";
 
 export class JenkinsJob {
     _class: string;
@@ -28,4 +29,5 @@ export class JenkinsJob {
     checked: boolean;
     org: string;
     orgId: number;
+    pipeline: Pipeline;
 }

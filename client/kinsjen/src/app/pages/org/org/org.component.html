@@ -19,37 +19,60 @@
       </div>
   </div>
 
-  <div id="chart" *ngIf="activeView == 1">
-    <apx-chart
-        [series]="chartOptions.series"
-        [chart]="chartOptions.chart"
-        [dataLabels]="chartOptions.dataLabels"
-        [plotOptions]="chartOptions.plotOptions"
-        [stroke]="chartOptions.stroke"
-        [title]="chartOptions.title"
-        [xaxis]="chartOptions.xaxis"
-        [tooltip]="chartOptions.tooltip">
-    </apx-chart>
+  <div class="col-8 offset-2" *ngIf="activeView == 1">
+    <div id="heatmap">
+        <apx-chart
+            [series]="heatmapOptions.series"
+            [chart]="heatmapOptions.chart"
+            [dataLabels]="heatmapOptions.dataLabels"
+            [plotOptions]="heatmapOptions.plotOptions"
+            [stroke]="heatmapOptions.stroke"
+            [title]="heatmapOptions.title"
+            [xaxis]="heatmapOptions.xaxis"
+            [tooltip]="heatmapOptions.tooltip">
+        </apx-chart>
+    </div>
+
+    <div class="row">
+        <div class="col-4" *ngFor="let data of lineChartData">
+            <div>
+                <apx-chart
+                    [series]="data.series"
+                    [chart]="lineChartOptions.chart"
+                    [xaxis]="data.xaxis"
+                    [dataLabels]="lineChartOptions.dataLabels"
+                    [grid]="lineChartOptions.grid"
+                    [stroke]="lineChartOptions.stroke"
+                    [title]="data.title"
+                ></apx-chart>
+            </div>
+        </div>
+    </div>
   </div>
 
   <div class="row" *ngIf="pipelinePage && 0 < pipelinePage.totalElements && activeView == 0">
     <div class="col-8 offset-2">
         <div class="row">
-            <div class="col-6 mb-5" *ngFor="let pipeline of pipelinePage.content">
+            <div class="col-6 mb-5" *ngFor="let job of jenkinsJobs">
                 <div class="card card-flush">
                     <div class="card-header">
                         <h3 class="card-title align-items-start flex-column">
-                            <a class="card-label fw-semibold text-gray-900 fs-5" [routerLink]="['pipelines', pipeline.id]">{{ pipeline.name }}</a>
-                            <span class="text-gray-500 mt-1 fw-semibold fs-7">{{ pipeline._class }}</span>
+                            <a class="card-label fw-semibold text-gray-900 fs-5" [routerLink]="['pipelines', job.pipeline.id]">{{ job.name }}</a>
+                            <span class="text-gray-500 mt-1 fw-semibold fs-7">{{ job._class }}</span>
                         </h3>
                     </div>
                     <div class="card-body pt-5">
-                        <div class="d-flex flex-stack">
+                        <div class="d-flex flex-stack" *ngIf="job.builds.length">
                             <div>
-                                <span><i class="bi bi-check-circle text-success text-xs"></i> &nbsp;#12</span>
+                                <span>
+                                    <i class="bi bi-check-circle text-success text-xs" *ngIf="job.builds[0].result == 'SUCCESS'"></i>
+                                    <i class="bi bi-check-circle text-danger text-xs" *ngIf="job.builds[0].result == 'FAILURE'"></i>
+                                    <i class="bi bi-check-circle text-warning text-xs" *ngIf="!['SUCCESS', 'FAILURE'].includes(job.builds[0].result)"></i>
+                                    {{ job.builds[0].displayName }}
+                                </span>
                             </div>
                             <div class="text-muted fw-semibold">
-                                <span><i class="bi bi-clock"></i> 9s</span>
+                                <span><i class="bi bi-clock"></i> {{ Math.trunc(job.builds[0].duration/1000) + 's' }} </span>
                             </div>
                         </div>
                     </div>
