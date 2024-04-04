@@ -19,6 +19,10 @@
       </div>
   </div>
 
+  <div class="col-6 offset-3 text-center alert alert-danger" *ngIf="pipelinePage && !pipelinePage.totalElements">
+    No pipelines found. Click <a href="/new">Add pipelines</a> to get started.
+  </div>
+
   <div class="col-8 offset-2" *ngIf="activeView == 1">
     <div id="heatmap">
         <apx-chart

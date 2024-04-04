@@ -22,6 +22,7 @@ import { Page } from '../../../model/page.model';
 import { ActiveView } from './active-view.model';
 import { JenkinsJobsService } from '../../../services/jenkins-jobs.service';
 import { JenkinsJob } from '../../../model/jenkins-job.model';
+import { OrgService } from '../../../services/org.service';
 
 export type ChartOptions = {
   series: ApexAxisChartSeries;
@@ -61,6 +62,7 @@ export class OrgComponent implements OnInit {
   error: string | undefined;
 
   /* org */
+  orgs: Page<Org>;
   org: Org;
 
   /* pipelines */
@@ -94,13 +96,14 @@ export class OrgComponent implements OnInit {
 
   constructor(private route: ActivatedRoute, 
     private breadcrumbService: BreadcrumbService, 
+    private orgService: OrgService,
     private jenkinsInstanceService: JenkinsInstanceService,
     private pipelineService: PipelineService,
     private jenkinsJobsService: JenkinsJobsService) { }
 
   ngOnInit(): void {
+    this.findOrgs();
     this.setBreadcrumb();
-    this.findPipelines();
 
     this.heatmapOptions = {
       tooltip: {
@@ -216,11 +219,29 @@ export class OrgComponent implements OnInit {
   }
 
   setBreadcrumb(): void {
-    let org = this.route.snapshot.paramMap.get('org') || "";
+    let org = this.route.snapshot.paramMap.get('org') || '';
     this.breadcrumbs[1].name = org;
 
     this.breadcrumbService.setTitle(this.componentTitle);
     this.breadcrumbService.setBreadcrumb(this.breadcrumbs);
+  }
+
+  findOrgs(): void {
+    this.orgService.findAll()
+    .pipe(takeUntil(this.destroy$))
+    .subscribe({
+      next: (response: Page<Org>) => {
+        this.orgs = response;
+        const name = this.route.snapshot.paramMap.get('org') || '';
+        const org = response.content.find(x => x.name == name);
+        if (org && org.id > 0) {
+          this.findPipelines(org);
+        }
+      },
+      error: (err) => {
+        this.error = JSON.stringify(err);
+      }
+    })
   }
 
   findAutomationServers(): void {
@@ -238,11 +259,8 @@ export class OrgComponent implements OnInit {
       });
   }
 
-  findPipelines(): void {
-    this.org = new Org(); 
-    this.org.id = 1;
-    
-    this.pipelineService.findAll(this.org.id)
+  findPipelines(org: Org): void {    
+    this.pipelineService.findAll(org.id)
     .pipe(takeUntil(this.destroy$), finalize(() => { 
       this.loading = false;
     }))
