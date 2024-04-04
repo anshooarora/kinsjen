@@ -285,7 +285,8 @@ export class OrgComponent implements OnInit {
 
   createHeatmap(): void {
     const series: any[] = [];
-    this.heatmapOptions.chart.height = this.pipelinePage.totalElements * 50;
+    console.log(this.pipelinePage.totalElements)
+    this.heatmapOptions.chart.height = 50 + this.pipelinePage.totalElements * 40;
     for (let pipeline of this.pipelinePage.content) {
       this.jenkinsJobsService.findJob(pipeline.id, 1)
         .pipe(takeUntil(this.destroy$), finalize(() => { 
