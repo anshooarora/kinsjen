@@ -71,7 +71,8 @@
                 <div class="card-body">
                     <div class="row">
                         <div class="col-12 mb-4" *ngFor="let job of jenkinsJobs; index as i">
-                            <label [ngClass]="job.checked ? 'btn-active-light-primary active' : ''" class="btn btn-outline btn-outline-dashed d-flex text-start p-6">
+                            <label [ngClass]="{'btn-active-light-primary active' : job.checked, 'btn-outline-success': job.saved}" 
+                                class="btn btn-outline btn-outline-dashed d-flex text-start p-6">
                                 <span class="form-check form-check-custom form-check-solid form-check-sm align-items-start mt-1">
                                     <input class="form-check-input" type="checkbox" name="p" [(ngModel)]="job.checked">
                                 </span>

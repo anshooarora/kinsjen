@@ -197,6 +197,7 @@ export class NewPipelineComponent implements OnInit {
       .subscribe({
         next: (response: Pipeline) => {
           console.log(response)
+          job.saved = true;
         },
         error: (err) => {
           console.log(err)

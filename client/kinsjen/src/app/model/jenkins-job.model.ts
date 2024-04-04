@@ -26,6 +26,7 @@ export class JenkinsJob {
     nextBuildNumber: number;
     concurrentBuild: boolean;
 
+    saved: boolean;
     checked: boolean;
     org: string;
     orgId: number;
