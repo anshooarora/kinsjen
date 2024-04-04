@@ -23,6 +23,7 @@ import { ActiveView } from './active-view.model';
 import { JenkinsJobsService } from '../../../services/jenkins-jobs.service';
 import { JenkinsJob } from '../../../model/jenkins-job.model';
 import { OrgService } from '../../../services/org.service';
+import { JenkinsBuild } from '../../../model/jenkins-build.model';
 
 export type ChartOptions = {
   series: ApexAxisChartSeries;
@@ -114,6 +115,7 @@ export class OrgComponent implements OnInit {
           if (value == 0) label = 'SUCCESS';
           if (value == 1) label = 'FAILURE';
           if (value == 2) label = 'UNSTABLE';
+          if (value == 8) label = 'BUILDING';
           return '<span class="fs-8">' + desc + ': ' + label + '</span>';
         }
       },
@@ -131,7 +133,6 @@ export class OrgComponent implements OnInit {
       series: [],
       chart: {
         background: "transparent",
-        height: 4 * 60,
         type: "heatmap",
         toolbar: {
           show: false
@@ -150,12 +151,6 @@ export class OrgComponent implements OnInit {
                 color: "#00A100"
               },
               {
-                from: 9,
-                to: 9,
-                name: "not run",
-                color: "#CCCCCC"
-              },
-              {
                 from: 2,
                 to: 2,
                 name: "unstable",
@@ -166,6 +161,18 @@ export class OrgComponent implements OnInit {
                 to: 1,
                 name: "failure",
                 color: "#FF0000"
+              },
+              {
+                from: 8,
+                to: 8,
+                name: "building",
+                color: "#1B84FF"
+              },
+              {
+                from: 9,
+                to: 9,
+                name: "not run",
+                color: "#CCCCCC"
               }
             ]
           }
@@ -278,7 +285,7 @@ export class OrgComponent implements OnInit {
 
   createHeatmap(): void {
     const series: any[] = [];
-    this.heatmapOptions.chart.height = this.pipelinePage.totalElements * 70;
+    this.heatmapOptions.chart.height = this.pipelinePage.totalElements * 50;
     for (let pipeline of this.pipelinePage.content) {
       this.jenkinsJobsService.findJob(pipeline.id, 1)
         .pipe(takeUntil(this.destroy$), finalize(() => { 
@@ -299,7 +306,7 @@ export class OrgComponent implements OnInit {
             for (let i = 0; i < (items >= 20 ? 20 : items); i++) {
               const data: any = {
                 x: response.builds[i].fullDisplayName,
-                y: this.getJenkinsResultIdx(response.builds[i].result),
+                y: this.getJenkinsResultIdx(response.builds[i]),
                 description: response.builds[i].fullDisplayName
               }
               seriesData.data.push(data);
@@ -320,18 +327,13 @@ export class OrgComponent implements OnInit {
     }
   }
 
-  private getJenkinsResultIdx(result: string): number {
+  private getJenkinsResultIdx(build: JenkinsBuild): number {
+    if (build.building) return 8;
+    const result = build.result;
     if (result == 'SUCCESS') return 0;
     if (result == 'FAILURE') return 1;
     if (result == 'UNSTABLE') return 2;
     return 9;
-  }
-
-  private getJenkinsResult(result: number): string {
-    if (result == 0) return 'SUCCESS';
-    if (result == 1) return 'FAILURE';
-    if (result == 2) return 'UNSTABLE';
-    return 'NODATA';
   }
 
   createPerfLine(): void {
@@ -351,5 +353,13 @@ export class OrgComponent implements OnInit {
       });
       console.log(this.lineChartData)
     }
+  }
+
+  getBuildStatus(job: JenkinsJob): string {
+    const build = job.builds[0];
+    if (build.building) {
+      return 'BUILDING';
+    }
+    return build.result;
   }
 }

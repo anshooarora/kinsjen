@@ -69,9 +69,15 @@
                         <div class="d-flex flex-stack" *ngIf="job.builds.length">
                             <div>
                                 <span>
-                                    <i class="bi bi-check-circle text-success text-xs" *ngIf="job.builds[0].result == 'SUCCESS'"></i>
-                                    <i class="bi bi-check-circle text-danger text-xs" *ngIf="job.builds[0].result == 'FAILURE'"></i>
-                                    <i class="bi bi-check-circle text-warning text-xs" *ngIf="!['SUCCESS', 'FAILURE'].includes(job.builds[0].result)"></i>
+                                    <i class="bi bi-check-circle text-success text-xs" title="result: SUCCESS" 
+                                        *ngIf="getBuildStatus(job) == 'SUCCESS'"></i>
+                                    <i class="bi bi-x-circle text-danger text-xs" title="result: FAILURE" 
+                                        *ngIf="getBuildStatus(job) == 'FAILURE'"></i>
+                                    <i class="bi bi-x-circle text-warning text-xs" title="result: {{ getBuildStatus(job) }}" 
+                                        *ngIf="['UNSTABLE', 'CANCELLED'].includes(getBuildStatus(job))"></i>
+                                    <i class="bi bi-check-circle text-muted text-xs" title="result: {{ getBuildStatus(job) }}" 
+                                        *ngIf="['NOT_BUILT', 'UNKNOWN'].includes(getBuildStatus(job))"></i>
+                                    <span class="spinner-border spinner-border-sm text-muted" *ngIf="getBuildStatus(job) == 'BUILDING'"></span>
                                     {{ job.builds[0].displayName }}
                                 </span>
                             </div>

@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -87,7 +88,7 @@ public class PipelineService {
             .orElseThrow(() -> new OrgNotFoundException("Org not found with id " + pipeline.getOrgId()));
         log.info("Saving a new instance of pipeline " + pipeline);
         final Page<Pipeline> pipelines = findAll(Pageable.ofSize(Integer.MAX_VALUE));
-        if (pipelines.stream().anyMatch(x -> x.getUrl().equals(pipeline.getUrl()))) {
+        if (pipelines.stream().anyMatch(x -> x.getUrl().equals(pipeline.getUrl()) && Objects.equals(x.getOrgId(), pipeline.getOrgId()))) {
             throw new DuplicatePipelineException("Exception thrown when creating an already existing pipeline '"
                     + pipeline.getName() + "' with url " + pipeline.getUrl());
         }
