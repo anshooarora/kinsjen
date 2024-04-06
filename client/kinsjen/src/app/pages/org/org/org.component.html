@@ -5,8 +5,8 @@
               <h1><i class="bi bi-building-gear fs-1 text-primary"></i></h1>
               <h1 class="fw-semibold">Pipelines</h1>
               <p>
-                <a routerLink="." (click)="activeView = 0" *ngIf="activeView != 0">Listing</a>
-                <a routerLink="." (click)="activeView = 1" *ngIf="activeView != 1">Metrics</a> &middot;  
+                <a routerLink="." (click)="changeView(0)" *ngIf="activeView != 0">Listing</a>
+                <a routerLink="." (click)="changeView(1)" *ngIf="activeView != 1">Metrics</a> &middot;  
                 <a routerLink="/new">Add pipelines</a>
               </p>
               <p class="mb-5" *ngIf="activeView == 0">Listing of all pipelines for extent-framework org</p>
@@ -24,8 +24,8 @@
   </div>
 
   <div class="col-8 offset-2" *ngIf="activeView == 1">
-    <div id="heatmap">
-        <apx-chart
+    <div *ngIf="heatmapOptions">
+        <apx-chart id="heatmap"
             [series]="heatmapOptions.series"
             [chart]="heatmapOptions.chart"
             [dataLabels]="heatmapOptions.dataLabels"
@@ -39,7 +39,7 @@
 
     <div class="row">
         <div class="col-4" *ngFor="let data of lineChartData">
-            <div>
+            <div *ngIf="lineChartOptions">
                 <apx-chart
                     [series]="data.series"
                     [chart]="lineChartOptions.chart"

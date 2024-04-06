@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
-import { Subject, finalize, takeUntil } from 'rxjs';
+import { ActivatedRoute, Router } from '@angular/router';
+import { Subject, finalize, forkJoin, takeUntil } from 'rxjs';
 import { ApexAxisChartSeries, 
   ApexTitleSubtitle, 
   ApexDataLabels, 
@@ -13,7 +13,6 @@ import { ApexAxisChartSeries,
 import { Breadcrumb } from '../../../model/breadcrumb.model';
 import { BreadcrumbService } from '../../../services/breadcrumb.service';
 import { JenkinsInstance } from '../../../model/jenkins-instance.model';
-import { JenkinsInstanceService } from '../../../services/jenkins-instance.service';
 import { Credential } from '../../../model/credential.model';
 import { PipelineService } from '../../../services/pipeline.service';
 import { Org } from '../../../model/org.model';
@@ -24,6 +23,7 @@ import { JenkinsJobsService } from '../../../services/jenkins-jobs.service';
 import { JenkinsJob } from '../../../model/jenkins-job.model';
 import { OrgService } from '../../../services/org.service';
 import { JenkinsBuild } from '../../../model/jenkins-build.model';
+import { Location } from '@angular/common';
 
 export type ChartOptions = {
   series: ApexAxisChartSeries;
@@ -96,16 +96,71 @@ export class OrgComponent implements OnInit {
 
 
   constructor(private route: ActivatedRoute, 
+    private router: Router,
+    private location: Location,
     private breadcrumbService: BreadcrumbService, 
     private orgService: OrgService,
-    private jenkinsInstanceService: JenkinsInstanceService,
     private pipelineService: PipelineService,
     private jenkinsJobsService: JenkinsJobsService) { }
 
   ngOnInit(): void {
     this.findOrgs();
     this.setBreadcrumb();
+  }
 
+  ngOnDestroy(): void {
+    this.destroy$.next(null);
+    this.destroy$.complete();
+  }
+
+  setBreadcrumb(): void {
+    let org = this.route.snapshot.paramMap.get('org') || '';
+    this.breadcrumbs[1].name = org;
+    this.breadcrumbService.setTitle(this.componentTitle);
+    this.breadcrumbService.setBreadcrumb(this.breadcrumbs);
+
+    if (this.route.snapshot.fragment == 'metrics') {
+      this.changeView(ActiveView.Metrics);
+    }
+  }
+
+  findOrgs(): void {
+    this.orgService.findAll()
+    .pipe(takeUntil(this.destroy$))
+    .subscribe({
+      next: (response: Page<Org>) => {
+        this.orgs = response;
+        const name = this.route.snapshot.paramMap.get('org') || '';
+        const org = response.content.find(x => x.name == name);
+        if (org && org.id > 0) {
+          this.findPipelines(org);
+        }
+      },
+      error: (err) => {
+        this.error = JSON.stringify(err);
+      }
+    })
+  }
+
+  findPipelines(org: Org): void {    
+    this.pipelineService.findAll(org.id)
+    .pipe(takeUntil(this.destroy$), finalize(() => { 
+      this.loading = false;
+    }))
+    .subscribe({
+      next: (response: Page<Pipeline>) => {
+        console.log(response);
+        this.pipelinePage = response;
+        this.setChartOptions();
+        this.createCharts();
+      },
+      error: (err) => {
+        this.error = JSON.stringify(err);
+      }
+    });
+  }
+
+  setChartOptions(): void {
     this.heatmapOptions = {
       tooltip: {
         custom: function(opts: any): any {
@@ -132,6 +187,7 @@ export class OrgComponent implements OnInit {
       },
       series: [],
       chart: {
+        height: 50 + (this.pipelinePage.totalElements * 40),
         background: "transparent",
         type: "heatmap",
         toolbar: {
@@ -210,7 +266,7 @@ export class OrgComponent implements OnInit {
       },
       grid: {
         row: {
-          colors: ["#f3f3f3", "transparent"], // takes an array which will be repeated on columns
+          colors: ["#f3f3f3", "transparent"],
           opacity: 0.5
         }
       },
@@ -220,111 +276,39 @@ export class OrgComponent implements OnInit {
     };
   }
 
-  ngOnDestroy(): void {
-    this.destroy$.next(null);
-    this.destroy$.complete();
-  }
-
-  setBreadcrumb(): void {
-    let org = this.route.snapshot.paramMap.get('org') || '';
-    this.breadcrumbs[1].name = org;
-
-    this.breadcrumbService.setTitle(this.componentTitle);
-    this.breadcrumbService.setBreadcrumb(this.breadcrumbs);
-  }
-
-  findOrgs(): void {
-    this.orgService.findAll()
-    .pipe(takeUntil(this.destroy$))
-    .subscribe({
-      next: (response: Page<Org>) => {
-        this.orgs = response;
-        const name = this.route.snapshot.paramMap.get('org') || '';
-        const org = response.content.find(x => x.name == name);
-        if (org && org.id > 0) {
-          this.findPipelines(org);
-        }
-      },
-      error: (err) => {
-        this.error = JSON.stringify(err);
+  createCharts(): void {
+    const jobs = this.pipelinePage.content.map(x => this.jenkinsJobsService.findJob(x.id, 1));
+    forkJoin(jobs).subscribe(jobs => {
+      for (let i = 0; i < this.pipelinePage.totalElements; i++) {
+        jobs[i].pipeline = this.pipelinePage.content[i];
       }
-    })
-  }
-
-  findAutomationServers(): void {
-    this.jenkinsInstanceService.findAll(0)
-      .pipe(takeUntil(this.destroy$), finalize(() => { 
-        this.loading = false;
-      }))
-      .subscribe({
-        next: (response: any) => {
-          
-        },
-        error: (err) => {
-          this.error = JSON.stringify(err);
-        }
-      });
-  }
-
-  findPipelines(org: Org): void {    
-    this.pipelineService.findAll(org.id)
-    .pipe(takeUntil(this.destroy$), finalize(() => { 
-      this.loading = false;
-    }))
-    .subscribe({
-      next: (response: Page<Pipeline>) => {
-        console.log(response);
-        this.pipelinePage = response;
-        this.createHeatmap();
-      },
-      error: (err) => {
-        this.error = JSON.stringify(err);
-      }
+      
+      this.jenkinsJobs = jobs;
+      this.createResultChart();
+      this.createPerfChart();
     });
   }
 
-  createHeatmap(): void {
+  createResultChart(): void {
     const series: any[] = [];
-    console.log(this.pipelinePage.totalElements)
-    this.heatmapOptions.chart.height = 50 + this.pipelinePage.totalElements * 40;
-    for (let pipeline of this.pipelinePage.content) {
-      this.jenkinsJobsService.findJob(pipeline.id, 1)
-        .pipe(takeUntil(this.destroy$), finalize(() => { 
-          this.createPerfLine();
-          this.loading = false;
-        }))
-        .subscribe({
-          next: (response: JenkinsJob) => {
-            response.pipeline = pipeline;
-            this.jenkinsJobs.push(response);
-            console.log(response)
-            const seriesData: any = {
-              name: response.displayName,
-              data: []
-            };
-            series.push(seriesData);
-            const items = response.builds.length;
-            for (let i = 0; i < (items >= 20 ? 20 : items); i++) {
-              const data: any = {
-                x: response.builds[i].fullDisplayName,
-                y: this.getJenkinsResultIdx(response.builds[i]),
-                description: response.builds[i].fullDisplayName
-              }
-              seriesData.data.push(data);
-            }
-            for (let i = items; i < 20; i++) {
-              const data: any = {
-                x: '',
-                y: 9
-              }
-              seriesData.data.push(data);
-            }
-            this.heatmapOptions.series = series;
-          },
-          error: (err) => {
-            this.error = JSON.stringify(err);
-          }
+
+    for (let job of this.jenkinsJobs) {
+      series.push({
+        name: job.displayName,
+        data: []
+      });
+      const builds = job.builds;
+      for (let i = 0; i < (builds.length >= 20 ? 20 : builds.length); i++) {
+        series.at(-1).data.push({
+          x: builds[i].fullDisplayName,
+          y: this.getJenkinsResultIdx(builds[i]),
+          description: builds[i].fullDisplayName
         });
+      }
+      for (let i = builds.length; i < 20; i++) {
+        series.at(-1).data.push({ x: '', y: 9 });
+      }
+      this.heatmapOptions.series = series;
     }
   }
 
@@ -337,23 +321,23 @@ export class OrgComponent implements OnInit {
     return 9;
   }
 
-  createPerfLine(): void {
-    this.lineChartData = [];
+  createPerfChart(): void {
     for (let job of this.jenkinsJobs) {
+      const builds = job.builds.reverse();
       this.lineChartData.push({
         title: {
           text: job.name
         },
         series: [{
           name: 'time (s)',
-          data: job.builds.flatMap(x => Math.trunc(x.duration/1000))
+          data: builds.flatMap(x => Math.trunc(x.duration/1000))
         }],
         xaxis: {
-          categories: job.builds.map(x => x.number)
+          categories: builds.map(x => x.number)
         }
       });
-      console.log(this.lineChartData)
     }
+    console.log(this.lineChartData)
   }
 
   getBuildStatus(job: JenkinsJob): string {
@@ -362,5 +346,12 @@ export class OrgComponent implements OnInit {
       return 'BUILDING';
     }
     return build.result;
+  }
+
+  changeView(view: ActiveView) {
+    this.activeView = view;
+    const fragment = view == ActiveView.Metrics ? 'metrics' : 'listing';
+    const urlTree = this.router.createUrlTree([], { fragment: fragment });
+    this.location.go(urlTree.toString());
   }
 }
