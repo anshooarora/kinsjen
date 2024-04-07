@@ -13,6 +13,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.Objects;
@@ -49,6 +50,10 @@ public class JenkinsConnectionService {
                     && responseEntity.hasBody()
                     && !StringUtils.isBlank(Objects.requireNonNull(responseEntity.getBody()).get_class());
             response.setValid(valid);
+        } catch (final HttpClientErrorException e) {
+            response.setStatusCode(e.getStatusCode());
+            response.setStatusText(e.getStatusText());
+            response.setError(e.getMessage());
         } catch (final Throwable t) {
             response.setError(t.getMessage());
         }
