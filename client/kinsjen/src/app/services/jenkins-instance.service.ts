@@ -10,7 +10,7 @@ import { environment } from '../../environments/environment';
 })
 export class JenkinsInstanceService {
 
-  private readonly PATH = 'jenkins';
+  private readonly PATH = 'jenkins/';
   private readonly API_ENDPOINT = new URL(this.PATH, environment.apiURL);
 
   constructor(private http: HttpClient) { }
@@ -27,7 +27,7 @@ export class JenkinsInstanceService {
   }
 
   delete(jenkinsInstance: JenkinsInstance): Observable<any> {
-    const url = new URL(this.API_ENDPOINT, jenkinsInstance.id.toString());
+    const url = new URL(jenkinsInstance.id.toString(), this.API_ENDPOINT);
     return this.http.delete<any>(url.href);
   }
 

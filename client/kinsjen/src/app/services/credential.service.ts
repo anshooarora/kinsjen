@@ -10,7 +10,7 @@ import { Page } from '../model/page.model';
 })
 export class CredentialService {
 
-  private readonly PATH = 'credentials';
+  private readonly PATH = 'credentials/';
   private readonly API_ENDPOINT = new URL(this.PATH, environment.apiURL);
 
   constructor(private http: HttpClient) { }
@@ -24,6 +24,11 @@ export class CredentialService {
 
   save(credential: Credential): Observable<Credential> {
     return this.http.post<Credential>(this.API_ENDPOINT.href, credential);
+  }
+
+  delete(credentialId: number): Observable<any> {
+    const url = new URL(credentialId.toString(), this.API_ENDPOINT);
+    return this.http.delete<any>(url.href);
   }
 
 }

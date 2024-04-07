@@ -1,1 +1,194 @@
-<p>manage-jenkins works!</p>
+<div class="container" style="margin-top: -75px;">
+    <div class="row">
+        <div class="col-8 offset-2">
+            <div class="header">
+                <div class="container-fluid d-flex align-items-center justify-content-between p-0">
+                    <div class="page-title d-flex flex-column align-items-start justify-content-center flex-wrap">
+                        <h1 class="text-gray-900 fw-normal my-0 fs-3">{{ title }}</h1>
+                    </div>
+                    <div class="d-flex flex-shrink-0">
+                      <div class="d-flex">
+                        <a routerLink="." class="btn bg-body btn-sm" 
+                            [ngClass]="{'btn-primary bg-primary': activeView == ActiveView.AddNewJenkins}" 
+                            tooltip="Add new Jenkins host"
+                            (click)="activateView(ActiveView.AddNewJenkins)">New Jenkins</a>
+                      </div>
+                      <div class="d-flex ms-1">
+                        <a routerLink="." class="btn bg-body btn-sm" 
+                            [ngClass]="{'btn-primary bg-primary': activeView == ActiveView.ManageJenkins}" 
+                            tooltip="Add new pipeline"
+                            (click)="activateView(ActiveView.ManageJenkins)">Manage Jenkins</a>
+                      </div>
+                      <div class="d-flex ms-1">
+                        <a routerLink="." class="btn bg-body btn-sm" 
+                            [ngClass]="{'btn-primary bg-primary': activeView == ActiveView.AddNewCredentials}" 
+                            tooltip="Add new pipeline"
+                            (click)="activateView(ActiveView.AddNewCredentials)">New Credentials</a>
+                      </div>
+                      <div class="d-flex ms-1">
+                        <a routerLink="." class="btn bg-body btn-sm" 
+                            [ngClass]="{'btn-primary bg-primary': activeView == ActiveView.ManageCredentials}" 
+                            tooltip="Add new pipeline"
+                            (click)="activateView(ActiveView.ManageCredentials)">Manage Credentials</a>
+                      </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- new jenkins instance -->
+            <div class="card py-5" *ngIf="activeView == ActiveView.AddNewJenkins">
+                <div class="card-body text-center">
+                    <div class="row mb-4 text-start">
+                        <div class="col-3">
+                            <div class="fw-semibold mt-2 mb-3">Automation Server</div>
+                        </div>
+                        <div class="col-9">
+                            <div class="row g-9">
+                                <div class="col-6">
+                                    <label class="btn btn-outline btn-outline-dashed btn-active-light-primary active d-flex text-start p-4">
+                                        <span class="form-check form-check-custom form-check-solid form-check-sm align-items-start mt-1">
+                                            <input class="form-check-input" type="radio" name="usage" value="1" checked="checked">
+                                        </span>
+                                        <span class="ms-5">
+                                            <span class="fw-bold mb-1 d-block">Jenkins</span>
+                                            <span class="fw-semibold fs-7 text-gray-600">An open source automation server to reliably build, test, and deploy software</span>
+                                        </span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mb-3 text-start">
+                        <div class="col-xl-3">
+                            <div class="fw-semibold mt-2 mb-3">Server Details</div>
+                        </div>
+                        <div class="col-9">
+                            <div class="input-group input-group-solid">
+                                <input type="text" class="form-control" [(ngModel)]="jenkinsInstance.name" placeholder="server-name" style="max-width: 25%;" />
+                                <span class="input-group-text"></span>
+                                <input type="text" class="form-control" [(ngModel)]="jenkinsInstance.url" placeholder="https://localhost/" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row text-start">
+                        <div class="col-xl-3">
+                            <div class="fw-semibold mt-2 mb-3">Authentication</div>
+                        </div>
+                        <div class="col-9">
+                            <div class="input-group input-group-solid">
+                                <input type="text" class="form-control" [(ngModel)]="credential.name" placeholder="name" style="max-width: 25%;" />
+                                <span class="input-group-text"></span>
+                                <input type="text" class="form-control" [(ngModel)]="credential.username" placeholder="user" style="max-width: 25%;"/>
+                                <span class="input-group-text"></span>
+                                <input type="password" class="form-control" [(ngModel)]="credential.apiToken" placeholder="apiToken"/>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row text-end">
+                        <div class="col-xl-3"></div>
+                        <div class="col-xl-9">
+                            <button type="submit" class="btn btn-primary mt-4 me-2" 
+                                [disabled]="!enableAddPipelines()" (click)="testConnection()">Test connection
+                                    <i class="ms-1 fw-bold fs-4 bi bi-check-circle text-success" *ngIf="isConnValid"></i></button>
+                            <button type="submit" class="btn btn-primary mt-4" 
+                                [disabled]="!isConnValid" (click)="save()">Save Jenkins</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- manage jenkins instances -->
+            <div class="row" *ngIf="jenkinsInstancePage && jenkinsInstancePage.content && activeView == ActiveView.ManageJenkins">
+                <div class="col-6 mb-3" *ngFor="let jenkins of jenkinsInstancePage.content">
+                    <div class="card py-3">
+                        <div class="card-header pb-1">
+                            <h3 class="card-title align-items-start flex-column">
+                                <a class="card-label fw-semibold text-gray-900 fs-5">{{ jenkins.name }}</a>
+                            </h3>
+                            <div class="card-toolbar">
+                                <a routerLink="." (click)="jenkinsInstanceDeleteId = jenkins.id"><i class="bi bi-trash"></i></a>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            {{ jenkins.url }}
+                        </div>
+                        <div class="card-footer py-3 d-flex flex-end" *ngIf="jenkins.id == jenkinsInstanceDeleteId">
+                            <button class="btn btn-danger" (click)="removeJenkinsInstance(jenkins)">Delete</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- add new credentials -->
+            <div class="card py-5" *ngIf="activeView == ActiveView.AddNewCredentials">
+                <div class="card-body text-center">
+                    <div class="row mb-3 text-start">
+                        <div class="col-xl-3">
+                            <div class="fw-semibold mt-2 mb-3">Jenkins</div>
+                        </div>
+                        <div class="col-9">
+                            <select class="form-select form-select-solid" (change)="onSelectJenkinsHostForCredential($event)" aria-label="Select Jenkins host">
+                                <option disabled selected [value]="-1">Select Jenkins host</option>
+                                <option *ngFor="let jenkins of jenkinsInstancePage.content" [value]="jenkins.id">{{ jenkins.name }}</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row text-start">
+                        <div class="col-xl-3">
+                            <div class="fw-semibold mt-2 mb-3">Authentication</div>
+                        </div>
+                        <div class="col-9">
+                            <div class="input-group input-group-solid">
+                                <input type="text" class="form-control" [(ngModel)]="credential.name" placeholder="name" style="max-width: 25%;" />
+                                <span class="input-group-text"></span>
+                                <input type="text" class="form-control" [(ngModel)]="credential.username" placeholder="user" style="max-width: 25%;"/>
+                                <span class="input-group-text"></span>
+                                <input type="password" class="form-control" [(ngModel)]="credential.apiToken" placeholder="apiToken"/>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row text-end">
+                        <div class="col-xl-3"></div>
+                        <div class="col-xl-9">
+                            <button type="submit" class="btn btn-primary mt-4 me-2" 
+                                [disabled]="!enableAddPipelines()" (click)="testConnection()">Test connection
+                                    <i class="ms-1 fw-bold fs-4 bi bi-check-circle text-success" *ngIf="isConnValid"></i></button>
+                            <button type="submit" class="btn btn-primary mt-4" 
+                                [disabled]="!isConnValid" (click)="saveCredentials()">Save Credentials
+                                    <i class="ms-1 fw-bold fs-4 bi bi-check-circle text-success" *ngIf="isCredentialSaved"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- manage credentials -->
+            <div class="row" *ngIf="credentialListing && credentialListing.length && activeView == ActiveView.ManageCredentials">
+                <div class="col-6 mb-3" *ngFor="let cred of credentialListing">
+                    <div class="card py-3">
+                        <div class="card-header pb-1">
+                            <h3 class="card-title align-items-start flex-column">
+                                <a class="card-label fw-semibold text-gray-900 fs-5">{{ cred.name }}</a>
+                            </h3>
+                            <div class="card-toolbar">
+                                <a routerLink="." (click)="credentialId = cred.id"><i class="bi bi-trash"></i></a>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <p>username: {{ cred.username }}</p>
+                            <p class="pb-0 mb-0">jenkins: {{ findJenkinsInstanceFromId(cred.jenkinsInstanceId).name }}</p>
+                        </div>
+                        <div class="card-footer py-3 d-flex flex-end" *ngIf="credentialId == cred.id">
+                            <button class="btn btn-danger" (click)="removeCredentials()">Delete</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- error -->
+            <div class="alert alert-danger bg-light-danger border border-danger border-dashed d-flex align-items-center p-5 mt-4" *ngIf="error">
+                {{ error }}
+            </div>
+            
+        </div>
+    </div>
+</div>	

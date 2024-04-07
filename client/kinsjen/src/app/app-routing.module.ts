@@ -5,6 +5,7 @@ import { OrgComponent } from './pages/org/org/org.component';
 import { StartComponent } from './pages/start/start.component';
 import { NewPipelineComponent } from './pages/pipeline/new-pipeline/new-pipeline.component';
 import { PipelineComponent } from './pages/pipeline/pipeline/pipeline.component';
+import { ManageJenkinsComponent } from './pages/jenkins/manage-jenkins/manage-jenkins.component';
 
 const routes: Routes = [
   { path: '', component: OrgListingComponent },
@@ -12,7 +13,8 @@ const routes: Routes = [
   { path: 'orgs', component: OrgListingComponent },
   { path: 'orgs/:org', component: OrgComponent },
   { path: 'orgs/:org/pipelines/:pipeline', component: PipelineComponent },
-  { path: 'new', component: NewPipelineComponent },
+  { path: 'pipelines', component: NewPipelineComponent },
+  { path: 'jenkins', component: ManageJenkinsComponent }
 ];
 
 @NgModule({
