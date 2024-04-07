@@ -11,6 +11,8 @@ import { JenkinsConsoleLogsService } from '../../../services/jenkins-console-log
 import { JenkinsTestReportService } from '../../../services/jenkins-test-report.service';
 import { TestReport } from '../../../model/test-report.model';
 import { JenkinsBuild } from '../../../model/jenkins-build.model';
+import { ActiveView } from './active-view.model';
+import { ChildReport } from '../../../model/child-report.model';
 
 @Component({
   selector: 'app-pipeline',
@@ -18,6 +20,8 @@ import { JenkinsBuild } from '../../../model/jenkins-build.model';
   styleUrl: './pipeline.component.scss'
 })
 export class PipelineComponent {
+
+  ActiveView = ActiveView;
 
   private destroy$: Subject<any> = new Subject<any>();
   private readonly componentTitle: string = 'Orgs';
@@ -40,6 +44,9 @@ export class PipelineComponent {
   loading: boolean = false;
   error: string | undefined;
   
+  /* view */
+  activeView: ActiveView = ActiveView.TestReport;
+
   /* pipeline */
   pipeline: Pipeline;
   pipelineId: number;
@@ -47,13 +54,14 @@ export class PipelineComponent {
   /* job */
   jenkinsJob: JenkinsJob;
   currentBuild: JenkinsBuild;
+  prevBuildNumber: number = -1;
   currentBuildNumber: number = -1;
 
   /* console logs */
   consoleText: string;
 
   /* testReport */
-  testReport: TestReport;
+  testReport: TestReport | any;
 
   constructor(private route: ActivatedRoute, 
     private breadcrumbService: BreadcrumbService, 
@@ -107,7 +115,7 @@ export class PipelineComponent {
         this.jenkinsJob = response;
         if (response.builds.length) {
           this.currentBuildNumber = response.builds[0].number;
-          this.findBuildDetails(this.currentBuildNumber);
+          this.findTestReport(this.currentBuildNumber);
         }
       },
       error: (err) => {
@@ -122,12 +130,34 @@ export class PipelineComponent {
     this.currentBuild = this.jenkinsJob.builds.find(x => x.number == buildNumber)!;
     this.consoleText = '';
     this.testReport = new TestReport();
-    forkJoin([this.findConsoleText(buildNumber), this.findTestReport(buildNumber)]).subscribe(_ => {
+    this.activeView = ActiveView.TestReport;
+    forkJoin([this.findTestReport(buildNumber)]).subscribe(_ => {
       this.loading = false;
     })
   }
 
+  findTestReport(buildNumber: number): Observable<TestReport> {
+    this.loading = true;
+    const ob = this.jenkinsTestReportService.find(this.pipelineId, buildNumber)
+      .pipe(takeUntil(this.destroy$), finalize(() => { 
+        this.loading = false;
+      }));
+    ob.subscribe({
+      next: (response: TestReport) => {
+        console.log(response)
+        this.testReport = response;
+      },
+      error: (err) => {
+        console.log(err)
+        this.testReport = null;
+        this.activateView(ActiveView.Logs);
+      }
+    });
+    return ob;
+  }
+
   findConsoleText(buildNumber: number): Observable<string> {
+    this.loading = true;
     const ob = this.jenkinsConsoleLogsService.find(this.pipelineId, buildNumber)
       .pipe(takeUntil(this.destroy$), finalize(() => { 
         this.loading = false;
@@ -143,21 +173,24 @@ export class PipelineComponent {
     return ob;
   }
 
-  findTestReport(buildNumber: number): Observable<TestReport> {
-    const ob = this.jenkinsTestReportService.find(this.pipelineId, buildNumber)
-      .pipe(takeUntil(this.destroy$), finalize(() => { 
-        this.loading = false;
-      }));
-    ob.subscribe({
-      next: (response: TestReport) => {
-        console.log(response)
-        this.testReport = response;
-      },
-      error: (err) => {
-        this.error = JSON.stringify(err);
+  activateView(activeView: ActiveView): void {
+    this.activeView = activeView;
+    
+    if (activeView == ActiveView.Logs) {
+      if (this.prevBuildNumber != this.currentBuildNumber) {
+        this.findConsoleText(this.currentBuildNumber);
+        this.prevBuildNumber = this.currentBuildNumber;
       }
-    });
-    return ob;
+    }
   }
 
+  getBuildIdx(): number {
+    return this.jenkinsJob.builds.findIndex(x => x.number == this.currentBuildNumber);
+  }
+
+  getDuration(childReports: ChildReport[]): number {
+    const duration = childReports.map(x => x.result.duration)
+      .reduce((sum, current) => sum + current);
+    return Math.trunc(duration);
+  }
 }

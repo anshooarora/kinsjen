@@ -1,4 +1,4 @@
-<div class="content d-flex flex-column flex-column-fluid h-100 mt-5" *ngIf="jenkinsJob">
+<div class="content d-flex flex-column flex-column-fluid h-100" *ngIf="jenkinsJob">
     <div class="container-xxl h-100">
         <div class="d-flex flex-column flex-lg-row h-100">
             <div class="flex-column flex-lg-row-auto w-350px mb-10 mt-6 mb-lg-0">
@@ -20,50 +20,125 @@
             </div>
             
             <div class="flex-lg-row-fluid">
-                <div class="card card-flush h-100 hover-scroll-y">
-                    <div class="card-header mb-10">
-                        <div class="d-flex justify-content-center flex-column pt-5">
-                            <a href="#" class="fs-4 fw-bold text-gray-900 text-hover-primary">
-                                Build {{ currentBuildNumber }} <span class="spinner-border spinner-border-sm align-middle ms-2" *ngIf="loading"></span>
-                            </a>
-                            <div *ngIf="testReport.totalCount > 0" class="mt-1 ms-n1">
-                                <span class="badge me-1" [ngClass]="'status-' + currentBuild.result.toLowerCase()">{{ currentBuild.result }}</span>
-                                &middot;
-                                <span class="badge badge-light-success me-1">{{ testReport.totalCount - testReport.failCount + testReport.skipCount }}</span>
-                                <span class="badge badge-light-danger me-1">{{ testReport.failCount }}</span>
-                                <span class="badge badge-light-warning me-1">{{ testReport.skipCount }}</span>
-                                &middot;
-                                <span class="badge badge-light">Duration {{ testReport.childReports[0].result.duration }}</span>
+                <div class="card">
+                    <div class="card-header p-5">
+                        <h3 class="card-title align-items-start flex-column">
+                            <span class="card-label fw-bold text-gray-800">Build #{{ currentBuildNumber }}</span>
+                            <span class="text-gray-500 mt-1 fw-semibold fs-8">Ran on {{ jenkinsJob.builds[getBuildIdx()].timestamp | date: 'yyyy-MMM-dd hh:mm:ss a' }}</span>
+                        </h3>
+                        <div class="card-toolbar">
+                            <button routerLink="." 
+                                class="btn btn-sm btn-light me-1" 
+                                [ngClass]="{'btn-primary': activeView == ActiveView.TestReport}" 
+                                [disabled]="!testReport" 
+                                (click)="activateView(ActiveView.TestReport)">Test Report 
+                                    <span class="spinner-border spinner-border-sm align-middle ms-2"
+                                        *ngIf="activeView == ActiveView.TestReport && loading"></span>
+                            </button>
+                            <button routerLink="." 
+                                class="btn btn-sm btn-light me-1" 
+                                [ngClass]="{'btn-primary': activeView == ActiveView.Logs}" 
+                                (click)="activateView(ActiveView.Logs)">Logs 
+                                    <span class="spinner-border spinner-border-sm align-middle ms-2"
+                                        *ngIf="activeView == ActiveView.Logs && loading"></span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <!--
+                <div class="d-flex justify-content-center flex-column pt-5">
+                    <a href="#" class="fs-4 fw-bold text-gray-900 text-hover-primary">
+                        Build {{ currentBuildNumber }} <span class="spinner-border spinner-border-sm align-middle ms-2" *ngIf="loading"></span>
+                    </a>
+                    <div *ngIf="testReport.totalCount > 0" class="mt-1 ms-n1">
+                        <span class="badge me-1" [ngClass]="'status-' + currentBuild.result.toLowerCase()">{{ currentBuild.result }}</span>
+                        &middot;
+                        <span class="badge badge-light-success me-1">{{ testReport.totalCount - testReport.failCount + testReport.skipCount }}</span>
+                        <span class="badge badge-light-danger me-1">{{ testReport.failCount }}</span>
+                        <span class="badge badge-light-warning me-1">{{ testReport.skipCount }}</span>
+                        &middot;
+                        <span class="badge badge-light">Duration {{ testReport.childReports[0].result.duration }}</span>
+                    </div>
+                </div>-->
+                
+
+                <ng-container *ngIf="activeView == ActiveView.TestReport && testReport && testReport.totalCount > 0">
+                    <div class="row ms-0 me-0">
+                        <div class="card col-3">
+                            <div class="card-header p-4">
+                                <div class="card-title d-flex flex-column">
+                                    <span class="fs-2 fw-bold lh-1 text-success">{{ testReport.totalCount - testReport.failCount + testReport.skipCount }}</span>
+                                    <span class="text-gray-500 pt-1 fw-semibold fs-7">Passed</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card col-3">
+                            <div class="card-header p-4">
+                                <div class="card-title d-flex flex-column">
+                                    <span class="fs-2 fw-bold lh-1 text-danger">{{ testReport.failCount }}</span>
+                                    <span class="text-gray-500 pt-1 fw-semibold fs-7">Failed</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card col-3">
+                            <div class="card-header p-4">
+                                <div class="card-title d-flex flex-column">
+                                    <span class="fs-2 fw-bold lh-1 text-warning">{{ testReport.skipCount }}</span>
+                                    <span class="text-gray-500 pt-1 fw-semibold fs-7">Skipped</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card col-3">
+                            <div class="card-header p-4">
+                                <div class="card-title d-flex flex-column">
+                                    <span class="fs-2 text-gray-500 fw-bold lh-1 text-warning">{{ getDuration(testReport.childReports) }}s</span>
+                                    <span class="text-gray-500 pt-1 fw-semibold fs-7">Duration</span>
+                                </div>
                             </div>
                         </div>
                     </div>
-                    
-                    <div class="card-body scroll-y">
-                        <div class="alert alert-danger bg-light-danger border border-danger border-dashed p-5" *ngIf="error">
-                            {{ error }}
-                        </div>
+                    <ng-container *ngFor="let report of testReport.childReports">
+                        <div class="card" *ngFor="let suite of report.result.suites">
+                            <div class="card-body p-6 scroll-y">
+                                <div class="alert alert-danger bg-light-danger border border-danger border-dashed p-5" *ngIf="error">
+                                    {{ error }}
+                                </div>
 
-                        <div class="table-responsive" *ngIf="testReport.totalCount > 0">
-                            <table class="table table-row-dashed table-row-gray-300 gy-3">
-                                <thead>
-                                    <tr class="fw-bold fs-7 text-gray-800">
-                                        <th>Name</th>
-                                        <th>Duration (s)</th>
-                                        <th>Last Failed</th>
-                                        <th>Status</th>
-                                </thead>
-                                <tbody>
-                                    <tr *ngFor="let test of testReport.childReports[0].result.suites[0].cases">
-                                        <td class="ff-monospace">{{ test.name }}</td>
-                                        <td><span class="badge badge-light">{{ test.duration }}</span></td>
-                                        <td>{{ test.failedSince == 0 ? 'Never' : test.failedSince }}</td>
-                                        <td><span class="badge" [ngClass]="'status-' + test.status!.toLowerCase()">{{ test.status }}</span></td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                                <div>
+                                    <div>
+                                        <p class="fs-7 mb-5 fw-bold">{{ suite.name }}</p>
+                                        <div class="table-responsive">
+                                            <table id="test-report" class="table table-rounded border border-gray-300 table-row-bordered table-row-gray-300 gy-3 gs-5 mb-0">
+                                                <thead>
+                                                    <tr class="fw-semibold fs-7 text-gray-800">
+                                                        <th>Name</th>
+                                                        <th>Duration (s)</th>
+                                                        <th>Last Failed</th>
+                                                        <th>Status</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr *ngFor="let test of suite.cases">
+                                                        <ng-container *ngIf="test.status.toLowerCase() != 'fixed'">
+                                                        <td>{{ test.name }}</td>
+                                                        <td><span class="badge badge-light">{{ test.duration }}</span></td>
+                                                        <td>{{ test.failedSince == 0 ? 'Never' : test.failedSince }}</td>
+                                                        <td><span class="badge" [ngClass]="'status-' + test.status.toLowerCase()">{{ test.status }}</span></td>
+                                                    </ng-container>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
+                    </ng-container>
+                </ng-container>
 
-                        <pre *ngIf="consoleText">
+                <div class="card" *ngIf="activeView == ActiveView.Logs && consoleText">
+                    <div class="card-body scroll-y pt-2">
+                        <pre *ngIf="activeView == ActiveView.Logs && consoleText">
 <!-- do not move the below mustache / <pre> indentation -->
 {{ consoleText }}
                         </pre>

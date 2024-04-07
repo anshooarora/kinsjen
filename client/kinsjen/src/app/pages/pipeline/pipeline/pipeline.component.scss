@@ -1,0 +1,22 @@
+#test-report {
+    th:first-child, td:first-child {
+        width: 60%;
+        max-width: 60%;
+        word-break: break-all;
+    }
+    th {
+        color: #99A1B7
+    }
+}
+.status-passed, .status-success {
+    background-color: var(--bs-success-light);
+    color: var(--bs-success);
+}
+.status-failure, .status-failed {
+    background-color: var(--bs-danger-light);
+    color: var(--bs-danger);
+}
+.status-skipped, .status-skip, .status-unstable {
+    background-color: var(--bs-warning-light);
+    color: var(--bs-warning);
+}
