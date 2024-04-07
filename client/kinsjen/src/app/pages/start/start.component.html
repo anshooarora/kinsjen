@@ -12,7 +12,7 @@
                     <p>Start by adding an org. You can later add & associate pipelines and group them together.</p>
                     <div class="col-4 offset-4 mt-10">
                         <input type="text" class="form-control" placeholder="myorg" [(ngModel)]="org.name" (keyup.enter)="saveOrg()" />
-                        <button type="submit" class="btn btn-primary mt-4" [disabled]="!org.name" (click)="saveOrg()">Create {{ org.name }}</button>
+                        <button type="submit" class="btn btn-primary mt-4" [disabled]="!org.name" (click)="saveOrg()">Create org {{ org.name }}</button>
                     </div>
                 </div>
             </div>
@@ -84,7 +84,8 @@
                         <div class="col-xl-3"></div>
                         <div class="col-xl-9">
                             <button type="submit" class="btn btn-primary mt-4 me-2" 
-                                [disabled]="!enableAddPipelines()" (click)="testConnection()">Test connection</button>
+                                [disabled]="!enableAddPipelines()" (click)="testConnection()">Test connection
+                                    <i class="ms-1 fw-bold fs-4 bi bi-check-circle text-success" *ngIf="isConnValid"></i></button>
                             <button type="submit" class="btn btn-primary mt-4" 
                                 [disabled]="!isConnValid" (click)="save()">Save Jenkins</button>
                         </div>
@@ -93,7 +94,7 @@
             </div>
 
             <!-- error -->
-            <div class="alert alert-danger bg-light-danger border border-danger border-dashed d-flex align-items-center p-5" *ngIf="error">
+            <div class="alert alert-danger bg-light-danger border border-danger border-dashed d-flex align-items-center p-5 mt-4" *ngIf="error">
                 {{ error }}
             </div>
             

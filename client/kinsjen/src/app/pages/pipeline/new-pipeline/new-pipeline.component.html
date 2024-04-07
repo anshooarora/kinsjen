@@ -1,8 +1,7 @@
 <div class="container">
     <div class="row">
         <div class="col-8 offset-2">
-            
-            <div class="card py-5">
+            <div class="card py-5 mt-3">
                 <div class="card-body text-center">
                     <div class="mb-5">
                         <i class="bi bi-houses fs-1 text-primary"></i>
@@ -17,8 +16,8 @@
                                 <div class="fw-semibold mt-2 mb-3">Org</div>
                             </div>
                             <div class="col-9">
-                                <select [(ngModel)]="orgSelection.id" (change)="findPipelines(orgSelection)" class="form-select form-select-solid" aria-label="Select Org">
-                                    <option disabled selected value>Select Org</option>
+                                <select [(ngModel)]="orgSelection.id" class="form-select form-select-solid" aria-label="Select org">
+                                    <option disabled selected [value]="-1">Select org</option>
                                     <option *ngFor="let org of orgs.content" [value]="org.id">{{ org.name }}</option>
                                 </select>
                             </div>
@@ -40,18 +39,18 @@
                                 <div class="fw-semibold mt-2 mb-3">Credentials</div>
                             </div>
                             <div class="col-9">
-                                <select [disabled]="!credentials || credentials.empty" [(ngModel)]="credentialSelection.name"
+                                <select [disabled]="!credentials || credentials.empty" [(ngModel)]="credentialSelection.id"
                                     class="form-select form-select-solid" aria-label="Select example">
-                                    <option>Select credentials</option>
-                                    <option *ngFor="let c of credentials.content">{{ c.name }}</option>
+                                    <option disabled selected value>Select credentials</option>
+                                    <option *ngFor="let c of credentials.content" value="{{c.id}}">{{ c.name }}</option>
                                 </select>
                             </div>
                         </div>
                         <div class="row text-end">
                             <div class="col-xl-3"></div>
                             <div class="col-xl-9">
-                                <button type="submit" class="btn btn-primary mt-4" [disabled]="!discoverPipelinesBtnEnabled()"
-                                    (click)="discoverPipelines()">Discover pipelines</button>
+                                <button type="submit" class="btn btn-primary mt-4" [disabled]="!discoverJobsBtnEnabled()"
+                                    (click)="discoverJobs()">Discover jobs</button>
                             </div>
                         </div>
                     </div>
@@ -59,7 +58,7 @@
             </div>
 
             <div class="mt-5 alert alert-danger bg-light-danger border border-danger border-dashed d-flex align-items-center p-5" 
-                *ngIf="jenkinsJobs && !jenkinsJobs.length">
+                *ngIf="jenkinsJobs && !jenkinsJobs.length && !error && !loading">
                 <p class="mb-0">Looks like all jobs of host <span class="fw-bold">{{ hostSelection.name }}</span> have either been added or no jobs were found.</p>
             </div>
 
@@ -74,7 +73,7 @@
                             <label [ngClass]="{'btn-active-light-primary active' : job.checked, 'btn-outline-success': job.saved}" 
                                 class="btn btn-outline btn-outline-dashed d-flex text-start p-6">
                                 <span class="form-check form-check-custom form-check-solid form-check-sm align-items-start mt-1">
-                                    <input class="form-check-input" type="checkbox" name="p" [(ngModel)]="job.checked">
+                                    <input class="form-check-input" type="checkbox" name="p" [(ngModel)]="job.checked" [disabled]="job.saved && !job.checked">
                                 </span>
                                 <span class="ms-5">
                                     <span class="fw-bold mb-1 d-block">{{ job.name }}</span>
@@ -89,7 +88,7 @@
                 </div>
             </div>
 
-            <div class="alert alert-danger bg-light-danger border border-danger border-dashed d-flex align-items-center p-5" *ngIf="error">
+            <div class="alert alert-danger bg-light-danger border border-danger border-dashed d-flex align-items-center p-5 mt-5" *ngIf="error">
                 {{ error }}
             </div>
         </div>

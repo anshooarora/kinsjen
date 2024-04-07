@@ -1,46 +1,26 @@
 <div class="content d-flex flex-column flex-column-fluid">
     <div class="container-xxl">
         <div class="row">
-            <div class="col-8 offset-2">
-                <div class="card py-5" *ngIf="showCreateOrgPanel && (!orgs || orgs!.size == 0)">
-                    <div class="card-body text-center">
-                        <div class="mb-5">
-                            <i class="bi bi-houses fs-1 text-primary"></i>
-                        </div>
-                        <h3>Looks like it's your first time here</h3>
-                        <p>Start by adding an org. You can later add & associate pipelines and group them together.</p>
-                        <div class="col-4 offset-4 mt-10">
-                            <input type="text" class="form-control" placeholder="myorg" [(ngModel)]="orgName" (keyup.enter)="saveOrg(orgName!)" />
-                            <button type="submit" class="btn btn-primary mt-4" [disabled]="!orgName" (click)="saveOrg(orgName!)">Start adding pipelines</button>
-                        </div>
-                    </div>
+            <div class="align-center text-center mb-10">
+                <h1><i class="bi bi-building-gear fs-1 text-primary"></i></h1>
+                <h1 class="fw-semibold">Orgs</h1>
+                <p class="mb-2">Organization listing</p>
+                <a [routerLink] class="text-primary ms-3 fw-semibold cursor-pointer" (click)="showCreateOrgSearchBox = true; orgName = undefined;">Create new org</a>
+
+                <div class="input-group w-450px mx-auto mb-5 mt-3" *ngIf="showCreateOrgSearchBox">
+                    <span class="input-group-text" id="search-orgs"><i class="bi bi-plus-circle"></i></span>
+                    <input type="text" class="form-control" placeholder="myorg" [(ngModel)]="orgName">
+                    <button class="btn btn-primary" [disabled]="!orgName" (click)="saveOrg(orgName!)">Save</button>
+                    <button href="#" class="btn bg-body" (click)="showCreateOrgSearchBox = false">Cancel</button>
                 </div>
 
-                <div class="alert alert-danger bg-light-danger border border-danger border-dashed d-flex align-items-center p-5" *ngIf="error">
-                    {{ error }}
+                <div class="input-group w-450px mx-auto mt-5">
+                    <span class="input-group-text" id="search-orgs"><i class="bi bi-search"></i></span>
+                    <input type="text" class="form-control" placeholder="Find an org..." [(ngModel)]="filterOrg">
                 </div>
             </div>
 
             <ng-container *ngIf="orgs && orgs.totalElements > 0">
-                <div class="align-center text-center mb-10">
-                    <h1><i class="bi bi-building-gear fs-1 text-primary"></i></h1>
-                    <h1 class="fw-semibold">Orgs</h1>
-                    <p class="mb-2">Organization listing</p>
-                    <a [routerLink] class="text-primary ms-3 fw-semibold cursor-pointer" (click)="showCreateOrgSearchBox = true; orgName = undefined;">Create new org</a>
-
-                    <div class="input-group w-450px mx-auto mb-5 mt-3" *ngIf="showCreateOrgSearchBox && orgs && orgs.size">
-                        <span class="input-group-text" id="search-orgs"><i class="bi bi-plus-circle"></i></span>
-                        <input type="text" class="form-control" placeholder="myorg" [(ngModel)]="orgName">
-                        <button class="btn btn-primary" [disabled]="!orgName" (click)="saveOrg(orgName!)">Save</button>
-                        <button href="#" class="btn bg-body" (click)="showCreateOrgSearchBox = false">Cancel</button>
-                    </div>
-
-                    <div class="input-group w-450px mx-auto mt-5">
-                        <span class="input-group-text" id="search-orgs"><i class="bi bi-search"></i></span>
-                        <input type="text" class="form-control" placeholder="Find an org..." [(ngModel)]="filterOrg">
-                    </div>
-                </div>
-
                 <div class="col-8 offset-2">
                     <div class="row">
                         <div class="col-6 mb-5" *ngFor="let org of orgs!.content! | textSearchFilter: filterOrg!: 'name'">
@@ -65,6 +45,11 @@
                     </div>
                 </div>
             </ng-container>
+
+            <div class="col-6 offset-3 text-center alert alert-danger" *ngIf="!orgs || orgs.totalElements == 0">
+                No orgs found. <a [routerLink] class="text-primary fw-semibold cursor-pointer" 
+                    (click)="showCreateOrgSearchBox = true; orgName = undefined;">Create new org</a> to get started.
+            </div>
         </div>
     </div>	
 </div>

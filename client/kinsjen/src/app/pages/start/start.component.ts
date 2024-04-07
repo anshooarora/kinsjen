@@ -21,13 +21,8 @@ import { ConnectionTestResponse } from '../../model/connection-test-response.mod
 export class StartComponent implements OnInit {
 
   private destroy$: Subject<any> = new Subject<any>();
-  private readonly componentTitle: string = 'Start';
-  private readonly breadcrumbs: Breadcrumb[] = [
-    {
-      name: 'start',
-      url: ''
-    }
-  ];
+  private readonly componentTitle: string = '';
+  private readonly breadcrumbs: Breadcrumb[] = [];
 
   /* state */
   error: string | undefined;
@@ -129,10 +124,12 @@ export class StartComponent implements OnInit {
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (response: ConnectionTestResponse) => {
+          console.log(response)
           this.isConnValid = response.valid;
         },
         error: (err) => {
-          this.error = JSON.stringify(err);
+          this.isConnValid = false;
+          this.error = JSON.stringify(err.error);
         }
       });
   }
@@ -149,6 +146,7 @@ export class StartComponent implements OnInit {
             .subscribe({
               next: (cred) => {
                 console.log(cred);
+                this.router.navigate(['orgs'])
               },
               error: (err) => {
                 this.error = JSON.stringify(err);

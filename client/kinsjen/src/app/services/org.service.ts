@@ -10,7 +10,7 @@ import { environment } from '../../environments/environment';
 })
 export class OrgService {
 
-  private readonly PATH = 'orgs';
+  private readonly PATH = 'orgs/';
   private readonly API_ENDPOINT = new URL(this.PATH, environment.apiURL);
   
   constructor(private http: HttpClient) { }
@@ -27,7 +27,7 @@ export class OrgService {
   }
 
   deleteOrg(org: Org): Observable<any> {
-    const url = new URL(this.API_ENDPOINT, org.id.toString());
+    const url = new URL(org.id.toString(), this.API_ENDPOINT);
     return this.http.delete<any>(url.href);
   }
 

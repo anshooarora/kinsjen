@@ -9,7 +9,6 @@
                 <a routerLink="." (click)="changeView(1)" *ngIf="activeView != 1">Metrics</a> &middot;  
                 <a routerLink="/new">Add pipelines</a>
               </p>
-              <p class="mb-5" *ngIf="activeView == 0">Listing of all pipelines for extent-framework org</p>
               
               <div class="input-group w-450px mx-auto" *ngIf="activeView == 0">
                   <span class="input-group-text" id="search-pipelines"><i class="bi bi-search"></i></span>
@@ -23,7 +22,7 @@
     No pipelines found. Click <a href="/new">Add pipelines</a> to get started.
   </div>
 
-  <div class="col-8 offset-2" *ngIf="activeView == 1">
+  <div class="col-8 offset-2" *ngIf="pipelinePage && 0 < pipelinePage.totalElements && activeView == 1">
     <div *ngIf="heatmapOptions">
         <apx-chart id="heatmap"
             [series]="heatmapOptions.series"

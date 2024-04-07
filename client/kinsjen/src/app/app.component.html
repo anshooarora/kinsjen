@@ -7,45 +7,28 @@
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
-      <div class="collapse navbar-collapse">
+      <div class="collapse navbar-collapse ms-5">
         <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-          <li class="nav-item">
-            <a class="nav-link active" aria-current="page" href="/">home</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="#">orgs</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="#">pipelines</a>
-          </li>
         </ul>
         <div class="d-flex">
-          <a href="#" class="btn btn-icon btn-outline btn-sm"><i class="bi bi-plus fs-1"></i></a>
+          <a href="https://github.com/anshooarora/kinsjen" class="btn btn-icon btn-outline btn-sm me-1"><i class="bi bi-github"></i></a>
         </div>
       </div>
     </div>
   </header>
   <div class="header">
-      <div class="container d-flex align-items-center justify-content-between">
+      <div class="container d-flex align-items-center justify-content-between" *ngIf="breadcrumbs && breadcrumbs.length">
           <div class="page-title d-flex flex-column align-items-start justify-content-center flex-wrap">
               <h1 class="text-gray-900 fw-normal my-0 fs-2">{{ componentTitle }}</h1>
               <ul class="breadcrumb breadcrumb-line text-muted fw-semibold fs-base my-1">
-              <li class="breadcrumb-item">
-                  <a routerLink="/">Home</a>
-              </li>
-                  <li class="breadcrumb-item" *ngFor="let breadcrumb of breadcrumbs">
-                      <a [routerLink]="['/', breadcrumb.url]" *ngIf="breadcrumb.url">{{ breadcrumb.name }}</a>
-                      <span *ngIf="!breadcrumb.url">{{ breadcrumb.name }}</span>
-                  </li>
+                <li class="breadcrumb-item">
+                    <a routerLink="/">Home</a>
+                </li>
+                <li class="breadcrumb-item" *ngFor="let breadcrumb of breadcrumbs">
+                    <a [routerLink]="['/', breadcrumb.url]" *ngIf="breadcrumb.url">{{ breadcrumb.name }}</a>
+                    <span *ngIf="!breadcrumb.url">{{ breadcrumb.name }}</span>
+                </li>
               </ul>
-          </div>
-
-          <div class="d-flex">
-              <div class="d-flex ms-3">
-                  <a href="#" class="btn btn-outline btm-sm" tooltip="">
-                      Button
-                  </a>
-              </div>
           </div>
       </div>
   </div>

@@ -80,11 +80,8 @@ export class NewPipelineComponent implements OnInit {
   }
 
   findPipelines(org: Org): void {
-    console.log(org)
     this.pipelineService.findAll(org.id)
-      .pipe(takeUntil(this._unsubscribe), finalize(() => { 
-        this.loading = false;
-      }))
+      .pipe(takeUntil(this._unsubscribe))
       .subscribe({
         next: (response: Page<Pipeline>) => {
           console.log(response);
@@ -100,14 +97,12 @@ export class NewPipelineComponent implements OnInit {
 
   findJenkinsInstance(): void {
     this.jenkinsInstanceService.findAll(0, -1)
-      .pipe(takeUntil(this._unsubscribe), finalize(() => { 
-        this.loading = false;
-      }))
+      .pipe(takeUntil(this._unsubscribe))
       .subscribe({
         next: (response: Page<JenkinsInstance>) => {
           console.log(response)
           this.jenkinsInstance = response;
-          this.hostSelection = response.totalElements == 1 ? response.content[0] : this.hostSelection;
+          //this.hostSelection = response.totalElements == 1 ? response.content[0] : this.hostSelection;
         },
         error: (err) => {
           this.error = JSON.stringify(err);
@@ -139,29 +134,49 @@ export class NewPipelineComponent implements OnInit {
       });
   }
 
-  discoverPipelines(): void {
+  discoverJobs(): void {
     this.loading = true;
     this.error = undefined;
     this.jenkinsJobs = [];
 
-    this.jenkinsJobsService.findJobs(this.hostSelection.id, this.credentialSelection.id, 0, true)
-      .pipe(takeUntil(this._unsubscribe), finalize(() => { 
-        this.loading = false;
-      }))
-      .subscribe({
-        next: (response: JenkinsJob[]) => {
-          const jobs = response.filter(x => !this.pipelineURLs.includes(x.url.replace(/\/$/, '')));
-          this.jenkinsJobs = jobs;
-          this.condenseContent = true;
-          console.log(response)
-        },
-        error: (err) => {
-          this.error = JSON.stringify(err);
-        }
-      });
+    this.pipelineService.findAll(this.orgSelection.id)
+    .pipe(takeUntil(this._unsubscribe))
+    .subscribe({
+      next: (response: Page<Pipeline>) => {
+        console.log(response);
+        this.pipelinePage = response;
+        this.pipelineURLs = this.pipelinePage.content.map(x => x.url.replace(/\/$/, ''));
+        
+        this.jenkinsJobsService.findJobs(this.hostSelection.id, this.credentialSelection.id, 0, true)
+        .pipe(takeUntil(this._unsubscribe), finalize(() => { 
+          this.loading = false;
+        }))
+        .subscribe({
+          next: (response: JenkinsJob[]) => {
+            
+            console.log(this.pipelineURLs)
+            if (this.pipelineURLs) {
+              this.jenkinsJobs = response.filter(x => !this.pipelineURLs.includes(x.url.replace(/\/$/, '')));;
+            } else {
+              this.jenkinsJobs = response;
+            }          
+            this.condenseContent = true;
+            console.log(response)
+          },
+          error: (err) => {
+            this.error = JSON.stringify(err.error);
+          }
+        });
+      },
+      error: (err) => {
+        this.error = JSON.stringify(err.error);
+      }
+    });
+    
+    
   }
 
-  discoverPipelinesBtnEnabled(): boolean {
+  discoverJobsBtnEnabled(): boolean {
     return this.orgSelection.id > 0 && this.hostSelection.name != '';
   }
 
@@ -191,13 +206,12 @@ export class NewPipelineComponent implements OnInit {
         _class: job._class
       };
       this.pipelineService.save(pipeline)
-      .pipe(takeUntil(this._unsubscribe), finalize(() => { 
-        this.loading = false;
-      }))
+      .pipe(takeUntil(this._unsubscribe))
       .subscribe({
         next: (response: Pipeline) => {
           console.log(response)
           job.saved = true;
+          job.checked = false;
         },
         error: (err) => {
           console.log(err)

@@ -57,6 +57,7 @@ export class OrgComponent implements OnInit {
       url: ''
     }
   ];
+  private readonly dataPoints: number = 20;
 
   /* state */
   loading: boolean = false;
@@ -114,7 +115,7 @@ export class OrgComponent implements OnInit {
   }
 
   setBreadcrumb(): void {
-    let org = this.route.snapshot.paramMap.get('org') || '';
+    const org = this.route.snapshot.paramMap.get('org') || '';
     this.breadcrumbs[1].name = org;
     this.breadcrumbService.setTitle(this.componentTitle);
     this.breadcrumbService.setBreadcrumb(this.breadcrumbs);
@@ -191,7 +192,7 @@ export class OrgComponent implements OnInit {
         background: "transparent",
         type: "heatmap",
         toolbar: {
-          show: false
+          show: true
         }
       },
       plotOptions: {
@@ -270,7 +271,7 @@ export class OrgComponent implements OnInit {
           opacity: 0.5
         }
       },
-      xaxis: { 
+      xaxis: {
         categories: [ ]
       }
     };
@@ -298,14 +299,14 @@ export class OrgComponent implements OnInit {
         data: []
       });
       const builds = job.builds;
-      for (let i = 0; i < (builds.length >= 20 ? 20 : builds.length); i++) {
+      for (let i = 0; i < (builds.length > this.dataPoints ? this.dataPoints : builds.length); i++) {
         series.at(-1).data.push({
           x: builds[i].fullDisplayName,
           y: this.getJenkinsResultIdx(builds[i]),
           description: builds[i].fullDisplayName
         });
       }
-      for (let i = builds.length; i < 20; i++) {
+      for (let i = builds.length; i < this.dataPoints; i++) {
         series.at(-1).data.push({ x: '', y: 9 });
       }
       this.heatmapOptions.series = series;
@@ -323,7 +324,7 @@ export class OrgComponent implements OnInit {
 
   createPerfChart(): void {
     for (let job of this.jenkinsJobs) {
-      const builds = job.builds.reverse();
+      const builds = job.builds.slice(0, this.dataPoints).reverse();
       this.lineChartData.push({
         title: {
           text: job.name
@@ -333,11 +334,11 @@ export class OrgComponent implements OnInit {
           data: builds.flatMap(x => Math.trunc(x.duration/1000))
         }],
         xaxis: {
+          tickAmount: 10,
           categories: builds.map(x => x.number)
         }
       });
     }
-    console.log(this.lineChartData)
   }
 
   getBuildStatus(job: JenkinsJob): string {

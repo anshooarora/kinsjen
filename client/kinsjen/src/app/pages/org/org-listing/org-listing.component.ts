@@ -86,6 +86,7 @@ export class OrgListingComponent implements OnInit {
       .subscribe({
         next: (response: any) => {
           this.findOrgs();
+          this.showCreateOrgSearchBox = false;
         },
         error: (err) => {
           this.error = JSON.stringify(err);
