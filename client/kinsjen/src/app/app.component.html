@@ -25,7 +25,7 @@
                     <a routerLink="/">Home</a>
                 </li>
                 <li class="breadcrumb-item" *ngFor="let breadcrumb of breadcrumbs">
-                    <a [routerLink]="['/', breadcrumb.url]" *ngIf="breadcrumb.url">{{ breadcrumb.name }}</a>
+                    <a [routerLink]="[breadcrumb.url]" *ngIf="breadcrumb.url">{{ breadcrumb.name }}</a>
                     <span *ngIf="!breadcrumb.url">{{ breadcrumb.name }}</span>
                 </li>
               </ul>

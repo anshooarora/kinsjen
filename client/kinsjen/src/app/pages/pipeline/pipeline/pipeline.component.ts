@@ -31,8 +31,8 @@ export class PipelineComponent {
       url: 'orgs'
     },
     {
-      name: 'pipelines',
-      url: 'orgs'
+      name: '',
+      url: '/orgs/'
     },
     {
       name: '?',
@@ -79,6 +79,7 @@ export class PipelineComponent {
   setBreadcrumb(): void {
     let org = this.route.snapshot.paramMap.get('org') || "";
     this.breadcrumbs[1].name = org;
+    this.breadcrumbs[1].url = this.breadcrumbs[1].url + org;
 
     const pipelineId = this.route.snapshot.paramMap.get('pipeline')!;
     this.pipelineId = +pipelineId;
