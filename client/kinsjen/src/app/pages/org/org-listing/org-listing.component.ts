@@ -33,6 +33,7 @@ export class OrgListingComponent implements OnInit {
   showCreateOrgSearchBox: boolean = false;
   orgName: string | undefined;
   filterOrg: string | undefined;
+  orgIdForDeletion: number;
 
   constructor(private router: Router, private breadcrumbService: BreadcrumbService, private orgService: OrgService) { }
 
