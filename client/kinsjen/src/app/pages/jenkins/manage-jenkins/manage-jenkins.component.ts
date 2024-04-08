@@ -8,6 +8,7 @@ import { JenkinsConnectionService } from '../../../services/jenkins-connection.s
 import { CredentialService } from '../../../services/credential.service';
 import { ConnectionTestResponse } from '../../../model/connection-test-response.model';
 import { ActiveView } from './active-view.model';
+import { BreadcrumbService } from '../../../services/breadcrumb.service';
 
 @Component({
   selector: 'app-manage-jenkins',
@@ -50,11 +51,13 @@ export class ManageJenkinsComponent implements OnInit {
   title: string;
 
   constructor(private cdr: ChangeDetectorRef,
+    private breadcrumbService: BreadcrumbService, 
     private jenkinsInstanceService: JenkinsInstanceService,
     private credentialService: CredentialService,
     private jenkinsConnectionService: JenkinsConnectionService) { }
 
   ngOnInit(): void {
+    this.breadcrumbService.setBreadcrumb([]);
     this.activateView(ActiveView.AddNewJenkins);
     this.findJenkinsInstances();
   }

@@ -3,7 +3,6 @@ import { JenkinsJobsService } from '../../../services/jenkins-jobs.service';
 import { Subject, finalize, takeUntil } from 'rxjs';
 import { JenkinsJob } from '../../../model/jenkins-job.model';
 import { JenkinsParams } from '../../../model/jenkins-params.model';
-import { ActivatedRoute } from '@angular/router';
 import { OrgService } from '../../../services/org.service';
 import { Page } from '../../../model/page.model';
 import { Org } from '../../../model/org.model';
@@ -13,6 +12,7 @@ import { Credential } from '../../../model/credential.model';
 import { CredentialService } from '../../../services/credential.service';
 import { PipelineService } from '../../../services/pipeline.service';
 import { Pipeline } from '../../../model/pipeline.model';
+import { BreadcrumbService } from '../../../services/breadcrumb.service';
 
 @Component({
   selector: 'app-new-pipeline',
@@ -24,7 +24,6 @@ export class NewPipelineComponent implements OnInit {
   private _unsubscribe: Subject<any> = new Subject<any>();
 
   loading: boolean = false;
-  condenseContent: boolean = false;
   error: string | undefined;
 
   /* org */
@@ -33,7 +32,7 @@ export class NewPipelineComponent implements OnInit {
 
   /* jenkins instances */
   jenkinsInstance: Page<JenkinsInstance> = new Page<JenkinsInstance>();
-  hostSelection: JenkinsInstance = new JenkinsInstance();
+  jenkinsInstanceSelection: JenkinsInstance = new JenkinsInstance();
 
   /* jenkins */
   jenkinsParams: JenkinsParams = new JenkinsParams();
@@ -47,7 +46,7 @@ export class NewPipelineComponent implements OnInit {
   pipelinePage: Page<Pipeline>;
   pipelineURLs: string[];
 
-  constructor(private route: ActivatedRoute, 
+  constructor(private breadcrumbService: BreadcrumbService, 
     private orgService: OrgService,
     private jenkinsInstanceService: JenkinsInstanceService,
     private credentialService: CredentialService,
@@ -55,6 +54,7 @@ export class NewPipelineComponent implements OnInit {
     private jenkinsJobsService: JenkinsJobsService) { }
   
   ngOnInit(): void {
+    this.breadcrumbService.setBreadcrumb([]);
     this.findOrgs();
     this.findJenkinsInstance();
   }
@@ -102,7 +102,6 @@ export class NewPipelineComponent implements OnInit {
         next: (response: Page<JenkinsInstance>) => {
           console.log(response)
           this.jenkinsInstance = response;
-          //this.hostSelection = response.totalElements == 1 ? response.content[0] : this.hostSelection;
         },
         error: (err) => {
           this.error = JSON.stringify(err);
@@ -111,10 +110,7 @@ export class NewPipelineComponent implements OnInit {
   }
 
   jenkinsInstanceChanged($event: any): void {
-    const selection = $event.target.value;
-    this.hostSelection = this.jenkinsInstance.content.find(x => x.name == selection)!;
-    const jenkinsInstanceId = this.hostSelection.id;
-    this.findCredentials(jenkinsInstanceId);
+    this.findCredentials(this.jenkinsInstanceSelection.id);
   }
 
   findCredentials(jenkinsInstanceId: number): void {
@@ -147,7 +143,7 @@ export class NewPipelineComponent implements OnInit {
         this.pipelinePage = response;
         this.pipelineURLs = this.pipelinePage.content.map(x => x.url.replace(/\/$/, ''));
         
-        this.jenkinsJobsService.findJobs(this.hostSelection.id, this.credentialSelection.id, 0, true)
+        this.jenkinsJobsService.findJobs(this.jenkinsInstanceSelection.id, this.credentialSelection.id, 0, true)
         .pipe(takeUntil(this._unsubscribe), finalize(() => { 
           this.loading = false;
         }))
@@ -160,7 +156,6 @@ export class NewPipelineComponent implements OnInit {
             } else {
               this.jenkinsJobs = response;
             }          
-            this.condenseContent = true;
             console.log(response)
           },
           error: (err) => {
@@ -172,12 +167,10 @@ export class NewPipelineComponent implements OnInit {
         this.error = JSON.stringify(err.error);
       }
     });
-    
-    
   }
 
   discoverJobsBtnEnabled(): boolean {
-    return this.orgSelection.id > 0 && this.hostSelection.name != '';
+    return this.orgSelection.id > 0 && this.jenkinsInstanceSelection.name != '';
   }
 
   saveBtnEnabled(): boolean {
@@ -198,7 +191,7 @@ export class NewPipelineComponent implements OnInit {
     for (let job of jobs) {
       const pipeline: Pipeline = {
         id: 0,
-        jenkinsInstanceId: this.hostSelection.id,
+        jenkinsInstanceId: this.jenkinsInstanceSelection.id,
         credentialId: this.credentialSelection.id,
         orgId: this.orgSelection.id,
         name: job.name,
