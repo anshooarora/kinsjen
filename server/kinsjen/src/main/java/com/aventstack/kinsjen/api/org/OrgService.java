@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.data.domain.Page;
@@ -77,8 +78,10 @@ public class OrgService {
     }
 
     @Transactional
-    @CacheEvict(value = "orgs", allEntries = true)
-    @CachePut(value = "org", key = "#id")
+    @Caching(evict = {
+        @CacheEvict(value = "orgs", allEntries = true),
+        @CacheEvict(value = "org", key = "#id")
+    })
     public void delete(final long id) {
         log.info("Deleting org with id " + id);
         repository.deleteById(id);

@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
@@ -80,8 +81,10 @@ public class JenkinsInstanceService {
     }
 
     @Transactional
-    @CacheEvict(value = "jenkinsInstances", allEntries = true)
-    @CachePut(value = "jenkinsInstance", key = "#id")
+    @Caching(evict = {
+        @CacheEvict(value = "jenkinsInstances", allEntries = true),
+        @CacheEvict(value = "jenkinsInstance", key = "#id")
+    })
     public void delete(final long id) {
         log.info("Deleting Jenkins instance with id " + id);
         repository.deleteById(id);

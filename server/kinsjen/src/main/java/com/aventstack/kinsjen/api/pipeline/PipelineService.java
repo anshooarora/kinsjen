@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.data.domain.Page;
@@ -107,8 +108,10 @@ public class PipelineService {
     }
 
     @Transactional
-    @CacheEvict(value = "pipelines", allEntries = true)
-    @CachePut(value = "pipeline", key = "#id")
+    @Caching(evict = {
+        @CacheEvict(value = "pipelines", allEntries = true),
+        @CacheEvict(value = "pipeline", key = "#id")
+    })
     public void delete(final long id) {
         log.info("Deleting pipeline with id " + id);
         repository.deleteById(id);

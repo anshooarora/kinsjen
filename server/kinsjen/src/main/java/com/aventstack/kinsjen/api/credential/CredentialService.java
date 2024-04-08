@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
@@ -81,14 +82,21 @@ public class CredentialService {
     }
 
     @Transactional
-    @CacheEvict(value = "credentials", allEntries = true)
-    @CachePut(value = "credential", key = "#id")
+    @Caching(evict = {
+        @CacheEvict(value = "credentials", allEntries = true),
+        @CacheEvict(value = "credential", key = "#id")
+    })
     public void delete(final long id) {
         log.info("Deleting credential with id " + id);
         repository.deleteById(id);
         log.info("Credential " + id + " was deleted successfully");
     }
 
+    @Transactional
+    @Caching(evict = {
+        @CacheEvict(value = "credentials", allEntries = true),
+        @CacheEvict(value = "credential", key = "#jenkinsInstanceId")
+    })
     public void deleteByJenkinsInstanceId(final long id) {
         log.info("Deleting credentials with jenkinsInstanceId = " + id);
         final List<Credential> credentials = repository.removeByJenkinsInstanceId(id);
