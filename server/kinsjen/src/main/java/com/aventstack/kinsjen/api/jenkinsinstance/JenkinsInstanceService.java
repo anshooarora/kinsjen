@@ -1,11 +1,13 @@
 package com.aventstack.kinsjen.api.jenkinsinstance;
 
+import com.aventstack.kinsjen.api.credential.CredentialService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.data.domain.Page;
@@ -29,6 +31,10 @@ public class JenkinsInstanceService {
 
     @Autowired
     private JenkinsInstanceRepository repository;
+
+    @Autowired
+    @Lazy
+    private CredentialService credentialService;
 
     @Cacheable(value = "jenkinsInstances")
     public Page<JenkinsInstance> findAll(final Pageable pageable) {
@@ -79,6 +85,8 @@ public class JenkinsInstanceService {
     public void delete(final long id) {
         log.info("Deleting Jenkins instance with id " + id);
         repository.deleteById(id);
+        log.info("Dependencies of this jenkins instance will be deleted...");
+        credentialService.deleteByJenkinsInstanceId(id);
         log.info("Jenkins instance " + id + " was deleted successfully");
     }
 
