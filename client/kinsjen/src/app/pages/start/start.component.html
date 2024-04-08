@@ -12,7 +12,7 @@
                     <p>Start by adding an org. You can later add & associate pipelines and group them together.</p>
                     <div class="col-4 offset-4 mt-10">
                         <input type="text" class="form-control" placeholder="myorg" [(ngModel)]="org.name" (keyup.enter)="saveOrg()" />
-                        <button type="submit" class="btn btn-primary mt-4" [disabled]="!org.name" (click)="saveOrg()">Create org {{ org.name }}</button>
+                        <button type="submit" class="btn btn-primary mt-4" [disabled]="!org.name" (click)="saveOrg()">Create {{ org.name }}</button>
                     </div>
                 </div>
             </div>
@@ -62,7 +62,7 @@
                             <div class="input-group input-group-solid">
                                 <input type="text" class="form-control" [(ngModel)]="jenkinsInstance.name" placeholder="server-name" style="max-width: 25%;" />
                                 <span class="input-group-text"></span>
-                                <input type="text" class="form-control" [(ngModel)]="jenkinsInstance.url" placeholder="https://localhost/" />
+                                <input type="text" class="form-control" [(ngModel)]="jenkinsInstance.url" placeholder="http://localhost/" />
                             </div>
                         </div>
                     </div>

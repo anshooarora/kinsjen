@@ -211,6 +211,7 @@ export class ManageJenkinsComponent implements OnInit {
       this.title = 'Add new Jenkins instance';
     } else if (view == ActiveView.ManageJenkins) {
       this.title = 'Manage Jenkins instances';
+      this.findJenkinsInstances();
     } else if (view == ActiveView.AddNewCredentials) {
       this.title = 'Add new credentials';
     } else if (view == ActiveView.ManageCredentials) {
