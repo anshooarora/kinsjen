@@ -1,14 +1,9 @@
-import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { Subject, takeUntil } from 'rxjs';
-import { Breadcrumb } from '../../../model/breadcrumb.model';
-import { BreadcrumbService } from '../../../services/breadcrumb.service';
 import { JenkinsInstance } from '../../../model/jenkins-instance.model';
 import { JenkinsInstanceService } from '../../../services/jenkins-instance.service';
 import { Credential } from '../../../model/credential.model';
 import { Page } from '../../../model/page.model';
-import { Org } from '../../../model/org.model';
-import { OrgService } from '../../../services/org.service';
 import { JenkinsConnectionService } from '../../../services/jenkins-connection.service';
 import { CredentialService } from '../../../services/credential.service';
 import { ConnectionTestResponse } from '../../../model/connection-test-response.model';
@@ -40,6 +35,7 @@ export class ManageJenkinsComponent implements OnInit {
   credential: Credential = new Credential();
   automationServerPage: Page<JenkinsInstance> = new Page();
   jenkinsInstanceDeleteId: number = -1;
+  isJenkinsInstanceSaved: boolean;
 
   /* test connection */
   isConnValid: boolean = false;
@@ -53,8 +49,7 @@ export class ManageJenkinsComponent implements OnInit {
   /* */
   title: string;
 
-  constructor(private route: ActivatedRoute, 
-    private router: Router,
+  constructor(private cdr: ChangeDetectorRef,
     private jenkinsInstanceService: JenkinsInstanceService,
     private credentialService: CredentialService,
     private jenkinsConnectionService: JenkinsConnectionService) { }
@@ -98,6 +93,13 @@ export class ManageJenkinsComponent implements OnInit {
             .subscribe({
               next: (cred) => {
                 console.log(cred);
+                this.jenkinsInstance = new JenkinsInstance();
+                this.credential = new Credential();
+                this.isConnValid = false;
+                this.isJenkinsInstanceSaved = true;
+                setTimeout(() => {
+                  this.isJenkinsInstanceSaved = false;
+                }, 2000);
               },
               error: (err) => {
                 this.error = JSON.stringify(err);
@@ -167,10 +169,12 @@ export class ManageJenkinsComponent implements OnInit {
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (cred) => {
+          this.isConnValid = false;
           this.isCredentialSaved = true;
           setTimeout(() => {
             this.isCredentialSaved = false;
-          }, 1000);
+          }, 2000);
+          this.credential = new Credential();
         },
         error: (err) => {
           this.error = JSON.stringify(err);
@@ -185,6 +189,7 @@ export class ManageJenkinsComponent implements OnInit {
       .subscribe({
         next: (cred) => {
           this.credentialListing = this.credentialListing.filter(x => x.id != this.credentialId);
+          this.cdr.detectChanges();
         },
         error: (err) => {
           this.error = JSON.stringify(err);
