@@ -7,7 +7,7 @@
               <p>
                 <a routerLink="." (click)="changeView(0)" *ngIf="activeView != 0">Listing</a>
                 <a routerLink="." (click)="changeView(1)" *ngIf="activeView != 1">Metrics</a> &middot;  
-                <a routerLink="/new">Add pipelines</a>
+                <a routerLink="/pipelines">Add pipelines</a>
               </p>
               
               <div class="input-group w-450px mx-auto" *ngIf="activeView == 0">
@@ -19,7 +19,7 @@
   </div>
 
   <div class="col-6 offset-3 text-center alert alert-danger" *ngIf="pipelinePage && !pipelinePage.totalElements">
-    No pipelines found. Click <a href="/new">Add pipelines</a> to get started.
+    No pipelines found. Click <a href="/pipelines">Add pipelines</a> to get started.
   </div>
 
   <div class="col-8 offset-2" *ngIf="pipelinePage && 0 < pipelinePage.totalElements && activeView == 1">
