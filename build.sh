@@ -54,6 +54,9 @@ cd ../../server/kinsjen
 echo "Running mvn clean install"
 mvn clean install
 
-echo "Launching kinsjen jar"
+echo "Building docker image"
+docker build --build-arg KINSJEN_JAR=target/kinsjen.jar -t kinsjen .
+
+echo "Launching kinsjen jar from /target/"
 cd target
-java -jar kinsjen-1.0-SNAPSHOT.jar
+java -jar kinsjen.jar
