@@ -43,3 +43,6 @@ build/
 ### logs ###
 logs/
 
+### static, templates ###
+src/main/resources/static
+src/main/resources/templates
