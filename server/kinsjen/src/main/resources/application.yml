@@ -1,7 +1,5 @@
 server:
   port: 80
-  servlet:
-    context-path: /api
 spring:
   jpa:
     show-sql: true
