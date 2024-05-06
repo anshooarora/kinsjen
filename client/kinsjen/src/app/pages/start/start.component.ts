@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Router } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
 import { Breadcrumb } from '../../model/breadcrumb.model';
 import { BreadcrumbService } from '../../services/breadcrumb.service';
@@ -12,6 +12,7 @@ import { OrgService } from '../../services/org.service';
 import { JenkinsConnectionService } from '../../services/jenkins-connection.service';
 import { CredentialService } from '../../services/credential.service';
 import { ConnectionTestResponse } from '../../model/connection-test-response.model';
+import { ErrorService } from '../../services/error.service';
 
 @Component({
   selector: 'app-start',
@@ -45,13 +46,13 @@ export class StartComponent implements OnInit {
   isConnValid: boolean = false;
 
   
-  constructor(private route: ActivatedRoute, 
-    private router: Router,
+  constructor(private router: Router,
     private breadcrumbService: BreadcrumbService,
     private orgService: OrgService,
     private jenkinsInstanceService: JenkinsInstanceService,
     private credentialService: CredentialService,
-    private jenkinsConnectionService: JenkinsConnectionService) { }
+    private jenkinsConnectionService: JenkinsConnectionService,
+    private errorService: ErrorService) { }
 
   ngOnInit(): void {
     console.log('starting...')
@@ -79,7 +80,7 @@ export class StartComponent implements OnInit {
           this.orgs = response;
         },
         error: (err) => {
-          this.error = JSON.stringify(err);
+          this.error = this.errorService.getError(err);
         }
       });
   }
@@ -96,7 +97,7 @@ export class StartComponent implements OnInit {
           this.findOrgs();
         },
         error: (err) => {
-          this.error = JSON.stringify(err);
+          this.error = this.errorService.getError(err);
         }
       });
   }
@@ -113,7 +114,7 @@ export class StartComponent implements OnInit {
           }
         },
         error: (err) => {
-          this.error = JSON.stringify(err);
+          this.error = this.errorService.getError(err);
         }
       });
   }
@@ -129,7 +130,7 @@ export class StartComponent implements OnInit {
         },
         error: (err) => {
           this.isConnValid = false;
-          this.error = JSON.stringify(err.error);
+          this.error = this.errorService.getError(err);
         }
       });
   }
@@ -149,12 +150,12 @@ export class StartComponent implements OnInit {
                 this.router.navigate(['orgs'])
               },
               error: (err) => {
-                this.error = JSON.stringify(err);
+                this.error = this.errorService.getError(err);
               }
             })
         },
         error: (err) => {
-          this.error = JSON.stringify(err);
+          this.error = this.errorService.getError(err);
         }
       });
   }

@@ -57,6 +57,10 @@
                 No orgs found. <a [routerLink] class="text-primary fw-semibold cursor-pointer" 
                     (click)="showCreateOrgSearchBox = true; orgName = undefined;">Create new org</a> to get started.
             </div>
+
+            <div class="col-6 offset-3 text-center alert alert-danger" *ngIf="error">
+                {{ error }}
+            </div>
         </div>
     </div>	
 </div>

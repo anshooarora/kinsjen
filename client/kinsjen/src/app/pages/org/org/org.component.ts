@@ -1,6 +1,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subject, finalize, forkJoin, takeUntil } from 'rxjs';
+import { Location } from '@angular/common';
 import { ApexAxisChartSeries, 
   ApexTitleSubtitle, 
   ApexDataLabels, 
@@ -23,7 +24,7 @@ import { JenkinsJobsService } from '../../../services/jenkins-jobs.service';
 import { JenkinsJob } from '../../../model/jenkins-job.model';
 import { OrgService } from '../../../services/org.service';
 import { JenkinsBuild } from '../../../model/jenkins-build.model';
-import { Location } from '@angular/common';
+import { ErrorService } from '../../../services/error.service';
 
 export type ChartOptions = {
   series: ApexAxisChartSeries;
@@ -102,7 +103,8 @@ export class OrgComponent implements OnInit {
     private breadcrumbService: BreadcrumbService, 
     private orgService: OrgService,
     private pipelineService: PipelineService,
-    private jenkinsJobsService: JenkinsJobsService) { }
+    private jenkinsJobsService: JenkinsJobsService,
+    private errorService: ErrorService) { }
 
   ngOnInit(): void {
     this.findOrgs();
@@ -138,7 +140,7 @@ export class OrgComponent implements OnInit {
         }
       },
       error: (err) => {
-        this.error = JSON.stringify(err);
+        this.error = this.errorService.getError(err);
       }
     })
   }
@@ -156,7 +158,7 @@ export class OrgComponent implements OnInit {
         this.createCharts();
       },
       error: (err) => {
-        this.error = JSON.stringify(err);
+        this.error = this.errorService.getError(err);
       }
     });
   }

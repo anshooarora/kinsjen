@@ -1,11 +1,11 @@
 import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
 import { Subject, finalize, takeUntil } from 'rxjs';
 import { OrgService } from '../../../services/org.service';
 import { Org } from '../../../model/org.model';
 import { Page } from '../../../model/page.model';
 import { BreadcrumbService } from '../../../services/breadcrumb.service';
 import { Breadcrumb } from '../../../model/breadcrumb.model';
+import { ErrorService } from '../../../services/error.service';
 
 @Component({
   selector: 'app-org-listing',
@@ -35,7 +35,9 @@ export class OrgListingComponent implements OnInit {
   filterOrg: string | undefined;
   orgIdForDeletion: number;
 
-  constructor(private router: Router, private breadcrumbService: BreadcrumbService, private orgService: OrgService) { }
+  constructor(private breadcrumbService: BreadcrumbService, 
+    private orgService: OrgService,
+    private errorService: ErrorService) { }
 
   ngOnInit(): void {
     this.setBreadcrumb();
@@ -66,7 +68,7 @@ export class OrgListingComponent implements OnInit {
           }
         },
         error: (err) => {
-          this.error = JSON.stringify(err);
+          this.error = this.errorService.getError(err);
         }
       });
   }
@@ -90,7 +92,7 @@ export class OrgListingComponent implements OnInit {
           this.showCreateOrgSearchBox = false;
         },
         error: (err) => {
-          this.error = JSON.stringify(err);
+          this.error = this.errorService.getError(err);
         }
       });
   }
@@ -104,7 +106,7 @@ export class OrgListingComponent implements OnInit {
           this.findOrgs();
         },
         error: (err) => {
-          this.error = JSON.stringify(err);
+          this.error = this.errorService.getError(err);
         }
       });
   }

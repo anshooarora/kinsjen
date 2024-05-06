@@ -13,6 +13,7 @@ import { TestReport } from '../../../model/test-report.model';
 import { JenkinsBuild } from '../../../model/jenkins-build.model';
 import { ActiveView } from './active-view.model';
 import { ChildReport } from '../../../model/child-report.model';
+import { ErrorService } from '../../../services/error.service';
 
 @Component({
   selector: 'app-pipeline',
@@ -68,7 +69,8 @@ export class PipelineComponent {
     private pipelineService: PipelineService,
     private jenkinsJobsService: JenkinsJobsService,
     private jenkinsConsoleLogsService: JenkinsConsoleLogsService,
-    private jenkinsTestReportService: JenkinsTestReportService) { }
+    private jenkinsTestReportService: JenkinsTestReportService,
+    private errorService: ErrorService) { }
 
   ngOnInit(): void {
     this.setBreadcrumb();
@@ -100,7 +102,7 @@ export class PipelineComponent {
         this.breadcrumbs.at(-1)!.name = response.name;
       },
       error: (err) => {
-        this.error = JSON.stringify(err);
+        this.error = this.errorService.getError(err);
       }
     });
   }
@@ -120,7 +122,7 @@ export class PipelineComponent {
         }
       },
       error: (err) => {
-        this.error = JSON.stringify(err);
+        this.error = this.errorService.getError(err);
       }
     });
   }
@@ -168,7 +170,7 @@ export class PipelineComponent {
         this.consoleText = response;
       },
       error: (err) => {
-        this.error = JSON.stringify(err);
+        this.error = this.errorService.getError(err);
       }
     });
     return ob;

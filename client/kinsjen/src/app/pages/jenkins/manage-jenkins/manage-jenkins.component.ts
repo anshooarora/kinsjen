@@ -9,6 +9,7 @@ import { CredentialService } from '../../../services/credential.service';
 import { ConnectionTestResponse } from '../../../model/connection-test-response.model';
 import { ActiveView } from './active-view.model';
 import { BreadcrumbService } from '../../../services/breadcrumb.service';
+import { ErrorService } from '../../../services/error.service';
 
 @Component({
   selector: 'app-manage-jenkins',
@@ -54,7 +55,8 @@ export class ManageJenkinsComponent implements OnInit {
     private breadcrumbService: BreadcrumbService, 
     private jenkinsInstanceService: JenkinsInstanceService,
     private credentialService: CredentialService,
-    private jenkinsConnectionService: JenkinsConnectionService) { }
+    private jenkinsConnectionService: JenkinsConnectionService,
+    private errorService: ErrorService) { }
 
   ngOnInit(): void {
     this.breadcrumbService.setBreadcrumb([]);
@@ -78,7 +80,7 @@ export class ManageJenkinsComponent implements OnInit {
         },
         error: (err) => {
           this.isConnValid = false;
-          this.error = JSON.stringify(err.error);
+          this.error = this.errorService.getError(err);
         }
       });
   }
@@ -105,12 +107,12 @@ export class ManageJenkinsComponent implements OnInit {
                 }, 2000);
               },
               error: (err) => {
-                this.error = JSON.stringify(err);
+                this.error = this.errorService.getError(err);
               }
             })
         },
         error: (err) => {
-          this.error = JSON.stringify(err);
+          this.error = this.errorService.getError(err);
         }
       });
   }
@@ -139,7 +141,7 @@ export class ManageJenkinsComponent implements OnInit {
           this.jenkinsInstancePage = response;
         },
         error: (err) => {
-          this.error = JSON.stringify(err);
+          this.error = this.errorService.getError(err);
         }
       });
   }
@@ -159,7 +161,7 @@ export class ManageJenkinsComponent implements OnInit {
             this.credentialListing.push(...response.content);
           },
           error: (err) => {
-            this.error = JSON.stringify(err);
+            this.error = this.errorService.getError(err);
           }
         });
     }
@@ -180,7 +182,7 @@ export class ManageJenkinsComponent implements OnInit {
           this.credential = new Credential();
         },
         error: (err) => {
-          this.error = JSON.stringify(err);
+          this.error = this.errorService.getError(err);
         }
       })
   }
@@ -195,7 +197,7 @@ export class ManageJenkinsComponent implements OnInit {
           this.cdr.detectChanges();
         },
         error: (err) => {
-          this.error = JSON.stringify(err);
+          this.error = this.errorService.getError(err);
         }
       })
     setTimeout(() => {

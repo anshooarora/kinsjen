@@ -13,6 +13,7 @@ import { CredentialService } from '../../../services/credential.service';
 import { PipelineService } from '../../../services/pipeline.service';
 import { Pipeline } from '../../../model/pipeline.model';
 import { BreadcrumbService } from '../../../services/breadcrumb.service';
+import { ErrorService } from '../../../services/error.service';
 
 @Component({
   selector: 'app-new-pipeline',
@@ -51,7 +52,8 @@ export class NewPipelineComponent implements OnInit {
     private jenkinsInstanceService: JenkinsInstanceService,
     private credentialService: CredentialService,
     private pipelineService: PipelineService,
-    private jenkinsJobsService: JenkinsJobsService) { }
+    private jenkinsJobsService: JenkinsJobsService,
+    private errorService: ErrorService) { }
   
   ngOnInit(): void {
     this.breadcrumbService.setBreadcrumb([]);
@@ -74,7 +76,7 @@ export class NewPipelineComponent implements OnInit {
         this.orgSelection = response.totalElements == 1 ? response.content[0] : this.orgSelection;
       },
       error: (err) => {
-        this.error = JSON.stringify(err);
+        this.error = this.errorService.getError(err);
       }
     })
   }
@@ -90,7 +92,7 @@ export class NewPipelineComponent implements OnInit {
           console.log(this.pipelineURLs);
         },
         error: (err) => {
-          this.error = JSON.stringify(err);
+          this.error = this.errorService.getError(err);
         }
       });
   }
@@ -104,7 +106,7 @@ export class NewPipelineComponent implements OnInit {
           this.jenkinsInstance = response;
         },
         error: (err) => {
-          this.error = JSON.stringify(err);
+          this.error = this.errorService.getError(err);
         }
       });
   }
@@ -125,7 +127,7 @@ export class NewPipelineComponent implements OnInit {
           this.credentialSelection = response.totalElements == 1 ? response.content[0] : this.credentialSelection;
         },
         error: (err) => {
-          this.error = JSON.stringify(err);
+          this.error = this.errorService.getError(err);
         }
       });
   }
@@ -159,12 +161,12 @@ export class NewPipelineComponent implements OnInit {
             console.log(response)
           },
           error: (err) => {
-            this.error = JSON.stringify(err.error);
+            this.error = this.errorService.getError(err);
           }
         });
       },
       error: (err) => {
-        this.error = JSON.stringify(err.error);
+        this.error = this.errorService.getError(err);
       }
     });
   }
@@ -207,8 +209,7 @@ export class NewPipelineComponent implements OnInit {
           job.checked = false;
         },
         error: (err) => {
-          console.log(err)
-          this.error = JSON.stringify(err);
+          this.error = this.errorService.getError(err);
         }
       });
     }

@@ -7,6 +7,7 @@ import { ActivatedRoute } from '@angular/router';
 import { OrgService } from '../../../services/org.service';
 import { Page } from '../../../model/page.model';
 import { Org } from '../../../model/org.model';
+import { ErrorService } from '../../../services/error.service';
 
 @Component({
   selector: 'app-new-job',
@@ -30,7 +31,8 @@ export class NewJobComponent implements OnInit {
 
   constructor(private route: ActivatedRoute, 
     private orgService: OrgService,
-    private jenkinsJobsService: JenkinsJobsService) { }
+    private jenkinsJobsService: JenkinsJobsService,
+    private errorService: ErrorService) { }
   
   ngOnInit(): void {
     this.findOrgs();
@@ -50,7 +52,7 @@ export class NewJobComponent implements OnInit {
         console.log(response)
       },
       error: (err) => {
-        this.error = JSON.stringify(err);
+        this.error = this.errorService.getError(err);
       }
     })
   }
@@ -74,7 +76,7 @@ export class NewJobComponent implements OnInit {
           console.log(response)
         },
         error: (err) => {
-          this.error = JSON.stringify(err);
+          this.error = this.errorService.getError(err);
         }
       });
   }
