@@ -1,0 +1,15 @@
+.stepper.stepper-pills .stepper-item .stepper-label .stepper-title {
+    color: var(--bs-gray-600);
+}
+.stepper.stepper-pills .stepper-item.current .stepper-label .stepper-title {
+    color: inherit;
+}
+.stepper.stepper-pills {
+    --bs-stepper-pills-size: 30px;
+}
+.stepper-title, .stepper-number {
+    font-size: 13px !important;
+}
+.stepper-complete .stepper-number {
+    color: #fff !important;
+}

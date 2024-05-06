@@ -1,93 +1,124 @@
-<div class="container">
+<div class="container mt-n10">
     <div class="row">
-        <div class="col-8 offset-2">
-            
-            <!-- org -->
-            <div class="card py-5" *ngIf="!orgs?.totalElements">
-                <div class="card-body text-center">
-                    <div class="mb-5">
-                        <i class="bi bi-houses fs-1 text-primary"></i>
-                    </div>
-                    <h3>Looks like it's your first time here</h3>
-                    <p>Start by adding an org. You can later add & associate pipelines and group them together.</p>
-                    <div class="col-4 offset-4 mt-10">
-                        <input type="text" class="form-control" placeholder="myorg" [(ngModel)]="org.name" (keyup.enter)="saveOrg()" />
-                        <button type="submit" class="btn btn-primary mt-4" [disabled]="!org.name" (click)="saveOrg()">Create {{ org.name }}</button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- org ready msg -->
-            <div class="alert bg-success p-5 text-light" *ngIf="orgs?.totalElements && org.name">
-                <div class="d-flex flex-column pe-0 pe-sm-10">
-                    <h5 class="mb-2 text-light">Your first org {{ org.name }} is ready!</h5>
-                </div>
-            </div>
-
-            <!-- automation-server -->
-            <div class="card py-5" *ngIf="orgs?.totalElements && !automationServerPage.totalElements">
-                <div class="card-body text-center">
-                    <div class="mb-5">
-                        <i class="bi bi-database-add fs-1 text-primary"></i>
-                    </div>
-                    <h3>Let's now add an Jenkins instance</h3>
-                    <p>You can add additional instances and auth tokens later</p>
-                    <p class="border-bottom"></p>
-
-                    <div class="row mb-4 mt-10 text-start">
-                        <div class="col-3">
-                            <div class="fw-semibold mt-2 mb-3">Automation Server</div>
+        <div class="col-12">
+            <div class="stepper stepper-pills stepper-column d-flex flex-column flex-lg-row">
+                <div class="d-flex flex-row-auto w-300px">
+                    <div class="stepper-nav mt-10">
+                        <div class="stepper-item me-5" [ngClass]="{'current': step == StartStepper.Org}">
+                            <div class="stepper-wrapper d-flex align-items-center">
+                                <div class="stepper-icon w-30px h-30px" [ngClass]="{'stepper-complete bg-success': step == StartStepper.Jenkins}">
+                                    <i class="stepper-check fas fa-check"></i>
+                                    <span class="stepper-number">1</span>
+                                </div>
+                                <div class="stepper-label">
+                                    <h3 class="stepper-title">
+                                        Create Org
+                                    </h3>
+                                </div>
+                            </div>
+                            <div class="stepper-line h-40px"></div>
                         </div>
-                        <div class="col-9">
-                            <div class="row g-9">
-                                <div class="col-6">
-                                    <label class="btn btn-outline btn-outline-dashed btn-active-light-primary active d-flex text-start p-4">
-                                        <span class="form-check form-check-custom form-check-solid form-check-sm align-items-start mt-1">
-                                            <input class="form-check-input" type="radio" name="usage" value="1" checked="checked">
-                                        </span>
-                                        <span class="ms-5">
-                                            <span class="fw-bold mb-1 d-block">Jenkins</span>
-                                            <span class="fw-semibold fs-7 text-gray-600">An open source automation server to reliably build, test, and deploy software</span>
-                                        </span>
-                                    </label>
+                        <div class="stepper-item me-5"  [ngClass]="{'current': step == StartStepper.Jenkins}">
+                            <div class="stepper-wrapper d-flex align-items-center">
+                                <div class="stepper-icon w-30px h-30px">
+                                    <i class="stepper-check fas fa-check"></i>
+                                    <span class="stepper-number">2</span>
+                                </div>
+                                <div class="stepper-label">
+                                    <h3 class="stepper-title">
+                                        Add Jenkins Instance
+                                    </h3>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div class="row mb-3 text-start">
-                        <div class="col-xl-3">
-                            <div class="fw-semibold mt-2 mb-3">Server Details</div>
-                        </div>
-                        <div class="col-9">
-                            <div class="input-group input-group-solid">
-                                <input type="text" class="form-control" [(ngModel)]="jenkinsInstance.name" placeholder="server-name" style="max-width: 25%;" />
-                                <span class="input-group-text"></span>
-                                <input type="text" class="form-control" [(ngModel)]="jenkinsInstance.url" placeholder="http://localhost/" />
+                </div>
+
+                <div class="flex-row-fluid">
+                    <div class="mb-5">
+                        <!-- org -->
+                        <div class="card col-6 py-5" *ngIf="!orgs?.totalElements">
+                            <div class="card-body">
+                                <h2 class="mb-4">Looks like it's your first time here</h2>
+                                <p>Start by adding an org. You can later add & associate pipelines and group them together.</p>
+                                <div class="mt-10">
+                                    <input type="text" class="form-control" placeholder="myorg" [(ngModel)]="org.name" (keyup.enter)="saveOrg()" />
+                                    <button type="submit" class="form-control btn btn-primary mt-4" [disabled]="!org.name" (click)="saveOrg()">Create {{ org.name }}</button>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="row text-start">
-                        <div class="col-xl-3">
-                            <div class="fw-semibold mt-2 mb-3">Authentication</div>
-                        </div>
-                        <div class="col-9">
-                            <div class="input-group input-group-solid">
-                                <input type="text" class="form-control" [(ngModel)]="credential.name" placeholder="name" style="max-width: 25%;" />
-                                <span class="input-group-text"></span>
-                                <input type="text" class="form-control" [(ngModel)]="credential.username" placeholder="user" style="max-width: 25%;"/>
-                                <span class="input-group-text"></span>
-                                <input type="password" class="form-control" [(ngModel)]="credential.apiToken" placeholder="apiToken"/>
+
+                        <!-- org ready msg -->
+                        <div class="col-9 alert bg-success p-5 text-light" *ngIf="orgs?.totalElements && org.name">
+                            <div class="d-flex flex-column pe-0 pe-sm-10">
+                                <h5 class="mb-2 text-light">Your first org {{ org.name }} is ready!</h5>
                             </div>
                         </div>
-                    </div>
-                    <div class="row text-end">
-                        <div class="col-xl-3"></div>
-                        <div class="col-xl-9">
-                            <button type="submit" class="btn btn-primary mt-4 me-2" 
-                                [disabled]="!enableAddPipelines()" (click)="testConnection()">Test connection
-                                    <i class="ms-1 fw-bold fs-4 bi bi-check-circle text-success" *ngIf="isConnValid"></i></button>
-                            <button type="submit" class="btn btn-primary mt-4" 
-                                [disabled]="!isConnValid" (click)="save()">Save Jenkins</button>
+
+                        <!-- automation-server -->
+                        <div class="card col-9 py-5" *ngIf="orgs?.totalElements && !automationServerPage.totalElements">
+                            <div class="card-body">
+                                <h2 class="mb-4">Let's now add an Jenkins instance</h2>
+                                <p>You can add additional instances and auth tokens later</p>
+                                <p class="border-bottom"></p>
+
+                                <div class="row mb-4 mt-10 text-start">
+                                    <div class="col-3">
+                                        <div class="fw-semibold mt-2 mb-3">Automation Server</div>
+                                    </div>
+                                    <div class="col-9">
+                                        <div class="row g-9">
+                                            <div class="col-6">
+                                                <label class="btn btn-outline btn-outline-dashed btn-active-light-primary active d-flex text-start p-4">
+                                                    <span class="form-check form-check-custom form-check-solid form-check-sm align-items-start mt-1">
+                                                        <input class="form-check-input" type="radio" name="usage" value="1" checked="checked">
+                                                    </span>
+                                                    <span class="ms-5">
+                                                        <span class="fw-bold mb-1 d-block">Jenkins</span>
+                                                        <span class="fw-semibold fs-7 text-gray-600">An open source automation server to reliably build, test, and deploy software</span>
+                                                    </span>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row mb-3 text-start">
+                                    <div class="col-xl-3">
+                                        <div class="fw-semibold mt-2 mb-3">Server Details</div>
+                                    </div>
+                                    <div class="col-9">
+                                        <div class="input-group input-group-solid">
+                                            <input type="text" class="form-control" [(ngModel)]="jenkinsInstance.name" placeholder="server-name" style="max-width: 25%;" />
+                                            <span class="input-group-text"></span>
+                                            <input type="text" class="form-control" [(ngModel)]="jenkinsInstance.url" placeholder="http://localhost/" />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row text-start">
+                                    <div class="col-xl-3">
+                                        <div class="fw-semibold mt-2 mb-3">Authentication</div>
+                                    </div>
+                                    <div class="col-9">
+                                        <div class="input-group input-group-solid">
+                                            <input type="text" class="form-control" [(ngModel)]="credential.name" placeholder="name" style="max-width: 25%;" />
+                                            <span class="input-group-text"></span>
+                                            <input type="text" class="form-control" [(ngModel)]="credential.username" placeholder="user" style="max-width: 25%;"/>
+                                            <span class="input-group-text"></span>
+                                            <input type="password" class="form-control" [(ngModel)]="credential.apiToken" placeholder="apiToken"/>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row text-end">
+                                    <div class="col-xl-3"></div>
+                                    <div class="col-xl-9">
+                                        <button type="submit" class="btn btn-primary mt-4 me-2" 
+                                            [disabled]="!enableAddPipelines()" (click)="testConnection()">Test connection
+                                                <i class="ms-1 fw-bold fs-4 bi bi-check-circle text-success" *ngIf="isConnValid"></i></button>
+                                        <button type="submit" class="btn btn-primary mt-4" 
+                                            [disabled]="!isConnValid" (click)="save()">Save Jenkins</button>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>

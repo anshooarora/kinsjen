@@ -13,6 +13,7 @@ import { JenkinsConnectionService } from '../../services/jenkins-connection.serv
 import { CredentialService } from '../../services/credential.service';
 import { ConnectionTestResponse } from '../../model/connection-test-response.model';
 import { ErrorService } from '../../services/error.service';
+import { StartStepper } from './start-stepper.model';
 
 @Component({
   selector: 'app-start',
@@ -21,12 +22,17 @@ import { ErrorService } from '../../services/error.service';
 })
 export class StartComponent implements OnInit {
 
+  StartStepper = StartStepper;
+
   private destroy$: Subject<any> = new Subject<any>();
   private readonly componentTitle: string = '';
   private readonly breadcrumbs: Breadcrumb[] = [];
 
   /* state */
   error: string | undefined;
+
+  /* steps */
+  step: StartStepper = StartStepper.Org;
 
   /* org */
   orgs: Page<Org>;
@@ -57,7 +63,6 @@ export class StartComponent implements OnInit {
   ngOnInit(): void {
     this.setBreadcrumb();
     this.findOrgs();
-    this.findJenkinsInstances();
   }
 
   ngOnDestroy(): void {
@@ -75,8 +80,11 @@ export class StartComponent implements OnInit {
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (response: Page<Org>) => {
-          console.log(response)
+          if (response.totalElements > 0) {
+            this.step = StartStepper.Jenkins;
+          }
           this.orgs = response;
+          this.findJenkinsInstances();
         },
         error: (err) => {
           this.error = this.errorService.getError(err);
@@ -94,6 +102,7 @@ export class StartComponent implements OnInit {
       .subscribe({
         next: () => {
           this.findOrgs();
+          this.step = StartStepper.Jenkins;
         },
         error: (err) => {
           this.error = this.errorService.getError(err);
@@ -108,7 +117,7 @@ export class StartComponent implements OnInit {
         next: (response: Page<JenkinsInstance>) => {
           this.automationServerPage = response;
           console.log(response)
-          if (response.totalElements > 0) {
+          if (this.orgs.totalElements > 0 && response.totalElements > 0) {
             this.router.navigate(['orgs']);
           }
         },
