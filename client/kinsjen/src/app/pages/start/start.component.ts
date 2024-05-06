@@ -55,7 +55,6 @@ export class StartComponent implements OnInit {
     private errorService: ErrorService) { }
 
   ngOnInit(): void {
-    console.log('starting...')
     this.setBreadcrumb();
     this.findOrgs();
     this.findJenkinsInstances();
