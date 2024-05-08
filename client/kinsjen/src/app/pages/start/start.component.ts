@@ -145,27 +145,31 @@ export class StartComponent implements OnInit {
 
   save(): void {
     this.jenkinsInstanceService.save(this.jenkinsInstance)
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: (jenkinsInstance: JenkinsInstance) => {
-          console.log(jenkinsInstance);
-          this.credential.jenkinsInstanceId = jenkinsInstance.id;
-          this.credentialService.save(this.credential)
-            .pipe(takeUntil(this.destroy$))
-            .subscribe({
-              next: (cred) => {
-                console.log(cred);
-                this.router.navigate(['orgs'])
-              },
-              error: (err) => {
-                this.error = this.errorService.getError(err);
-              }
-            })
-        },
-        error: (err) => {
-          this.error = this.errorService.getError(err);
-        }
-      });
+    .pipe(takeUntil(this.destroy$))
+    .subscribe({
+      next: (jenkinsInstance: JenkinsInstance) => {
+        console.log(jenkinsInstance);
+        this.credential.jenkinsInstanceId = jenkinsInstance.id;
+        this.saveCredentials();
+      },
+      error: (err) => {
+        this.error = this.errorService.getError(err);
+      }
+    });
+  }
+
+  saveCredentials(): void {
+    this.credentialService.save(this.credential)
+    .pipe(takeUntil(this.destroy$))
+    .subscribe({
+      next: (cred) => {
+        console.log(cred);
+        this.router.navigate(['orgs'])
+      },
+      error: (err) => {
+        this.error += this.errorService.getError(err);
+      }
+    })
   }
 
   enableAddPipelines(): boolean {
