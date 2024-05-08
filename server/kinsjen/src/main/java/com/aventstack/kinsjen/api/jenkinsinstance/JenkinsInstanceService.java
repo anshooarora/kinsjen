@@ -83,7 +83,7 @@ public class JenkinsInstanceService {
     @Transactional
     @Caching(evict = {
         @CacheEvict(value = "jenkinsInstances", allEntries = true),
-        @CacheEvict(value = "jenkinsInstance", key = "#id")
+        @CacheEvict(value = "jenkinsInstance", key = "#id", condition="#id != null")
     })
     public void delete(final long id) {
         log.info("Deleting Jenkins instance with id " + id);

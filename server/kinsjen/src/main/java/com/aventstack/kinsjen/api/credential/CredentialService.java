@@ -95,7 +95,7 @@ public class CredentialService {
     @Transactional
     @Caching(evict = {
         @CacheEvict(value = "credentials", allEntries = true),
-        @CacheEvict(value = "credential", key = "#jenkinsInstanceId")
+        @CacheEvict(value = "credential", key = "#id", condition = "#id != null")
     })
     public void deleteByJenkinsInstanceId(final long id) {
         log.info("Deleting credentials with jenkinsInstanceId = " + id);

@@ -187,13 +187,13 @@ export class ManageJenkinsComponent implements OnInit {
       })
   }
 
-  removeCredentials(): void {
+  removeCredentials(cred: Credential): void {
     this.error = undefined;
     this.credentialService.delete(this.credentialId)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
-        next: (cred) => {
-          this.credentialListing = this.credentialListing.filter(x => x.id != this.credentialId);
+        next: () => {
+          this.credentialListing = this.credentialListing.filter(x => x.id != cred.id);
           this.cdr.detectChanges();
         },
         error: (err) => {
