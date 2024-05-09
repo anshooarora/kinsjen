@@ -106,7 +106,7 @@
                                                         <ng-container *ngIf="test.status.toLowerCase() != 'fixed'">
                                                         <td>{{ test.name }}</td>
                                                         <td><span class="badge badge-light">{{ test.duration }}</span></td>
-                                                        <td>{{ test.failedSince == 0 ? 'Never' : test.failedSince }}</td>
+                                                        <td>{{ test.failedSince == 0 ? 'Never' : test.failedSince == report.child.number ? 'Just now' : test.failedSince }}</td>
                                                         <td><span class="badge" [ngClass]="'status-' + test.status.toLowerCase()">{{ test.status }}</span></td>
                                                     </ng-container>
                                                     </tr>

@@ -23,6 +23,7 @@
   </div>
 
   <div class="col-8 offset-2" *ngIf="pipelinePage && 0 < pipelinePage.totalElements && activeView == 1">
+    <!-- build result -->
     <div *ngIf="heatmapOptions">
         <apx-chart id="heatmap"
             [series]="heatmapOptions.series"
@@ -36,16 +37,36 @@
         </apx-chart>
     </div>
 
+    <!-- build performance -->
+    <h3 class="text-primary fs-7 ms-3">Performance</h3>
     <div class="row">
-        <div class="col-4" *ngFor="let data of lineChartData">
-            <div *ngIf="lineChartOptions">
+        <div class="col-4" *ngFor="let data of perfLineChartData">
+            <div *ngIf="perfLineChartOptions">
                 <apx-chart
                     [series]="data.series"
-                    [chart]="lineChartOptions.chart"
+                    [chart]="perfLineChartOptions.chart"
                     [xaxis]="data.xaxis"
-                    [dataLabels]="lineChartOptions.dataLabels"
-                    [grid]="lineChartOptions.grid"
-                    [stroke]="lineChartOptions.stroke"
+                    [dataLabels]="perfLineChartOptions.dataLabels"
+                    [grid]="perfLineChartOptions.grid"
+                    [stroke]="perfLineChartOptions.stroke"
+                    [title]="data.title"
+                ></apx-chart>
+            </div>
+        </div>
+    </div>
+
+    <!-- test growth -->
+    <h3 class="text-primary fs-7 ms-3">Tests Run</h3>
+    <div class="row">
+        <div class="col-4" *ngFor="let data of testsLineChartData">
+            <div *ngIf="testsLineChartOptions">
+                <apx-chart
+                    [series]="data.series"
+                    [chart]="testsLineChartOptions.chart"
+                    [xaxis]="data.xaxis"
+                    [dataLabels]="testsLineChartOptions.dataLabels"
+                    [grid]="testsLineChartOptions.grid"
+                    [stroke]="testsLineChartOptions.stroke"
                     [title]="data.title"
                 ></apx-chart>
             </div>
@@ -77,11 +98,11 @@
                                     <i class="bi bi-check-circle text-muted text-xs" title="result: {{ getBuildStatus(job) }}" 
                                         *ngIf="['NOT_BUILT', 'UNKNOWN'].includes(getBuildStatus(job))"></i>
                                     <span class="spinner-border spinner-border-sm text-muted" *ngIf="getBuildStatus(job) == 'BUILDING'"></span>
-                                    {{ job.builds[0].displayName }}
+                                    {{ job.builds[job.builds.length - 1].displayName }}
                                 </span>
                             </div>
                             <div class="text-muted fw-semibold">
-                                <span><i class="bi bi-clock"></i> {{ Math.trunc(job.builds[0].duration/1000) + 's' }} </span>
+                                <span><i class="bi bi-clock"></i> {{ getLastBuildDuration(job) }} </span>
                             </div>
                         </div>
                     </div>

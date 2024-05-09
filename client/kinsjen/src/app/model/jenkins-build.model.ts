@@ -1,7 +1,7 @@
-import { JenkinsBuildResult } from "./jenkins-build-result.model";
+import { JenkinsBuildActions } from "./jenkins-build-actions.model";
 
 export class JenkinsBuild {
-    actions: any;
+    actions: JenkinsBuildActions[];
     building: boolean;
     builtOn: string;
     culprits: any;

@@ -91,10 +91,16 @@ export class OrgComponent implements OnInit {
   @ViewChild("heatmap") chart: ChartComponent;
   public heatmapOptions: Partial<ChartOptions> | any;
 
-  /* line chart */
-  @ViewChild("line") lineChart: ChartComponent;
-  public lineChartOptions: Partial<ChartOptions> | any;
-  lineChartData: any = [];
+  /* perf line chart */
+  @ViewChild("line") perfLineChart: ChartComponent;
+  public perfLineChartOptions: Partial<ChartOptions> | any;
+  perfLineChartData: any = [];
+
+  /* perf line chart */
+  @ViewChild("line") testsLineChart: ChartComponent;
+  public testsLineChartOptions: Partial<ChartOptions> | any;
+  testsLineChartData: any = [];
+
 
 
   constructor(private route: ActivatedRoute, 
@@ -152,7 +158,6 @@ export class OrgComponent implements OnInit {
     }))
     .subscribe({
       next: (response: Page<Pipeline>) => {
-        console.log(response);
         this.pipelinePage = response;
         this.setChartOptions();
         this.createCharts();
@@ -245,7 +250,40 @@ export class OrgComponent implements OnInit {
       }
     };
 
-    this.lineChartOptions = {
+    this.perfLineChartOptions = {
+      series: [
+        {
+          name: "",
+          data: []
+        }
+      ],
+      chart: {
+        height: 250,
+        type: "line",
+        zoom: {
+          enabled: false
+        }
+      },
+      dataLabels: {
+        enabled: false
+      },
+      stroke: {
+        curve: "straight"
+      },
+      title: {
+      },
+      grid: {
+        row: {
+          colors: ["#f3f3f3", "transparent"],
+          opacity: 0.5
+        }
+      },
+      xaxis: {
+        categories: [ ]
+      }
+    };
+
+    this.testsLineChartOptions = {
       series: [
         {
           name: "",
@@ -289,6 +327,7 @@ export class OrgComponent implements OnInit {
       this.jenkinsJobs = jobs;
       this.createResultChart();
       this.createPerfChart();
+      this.createTestGrowthChart();
     });
   }
 
@@ -300,7 +339,7 @@ export class OrgComponent implements OnInit {
         name: job.displayName,
         data: []
       });
-      const builds = job.builds;
+      const builds = job.builds.reverse();
       for (let i = 0; i < (builds.length > this.dataPoints ? this.dataPoints : builds.length); i++) {
         series.at(-1).data.push({
           x: builds[i].fullDisplayName,
@@ -326,8 +365,8 @@ export class OrgComponent implements OnInit {
 
   createPerfChart(): void {
     for (let job of this.jenkinsJobs) {
-      const builds = job.builds.slice(0, this.dataPoints).reverse();
-      this.lineChartData.push({
+      const builds = job.builds.slice(0, this.dataPoints);
+      this.perfLineChartData.push({
         title: {
           text: job.name
         },
@@ -343,12 +382,64 @@ export class OrgComponent implements OnInit {
     }
   }
 
+  createTestGrowthChart(): void {
+    for (let job of this.jenkinsJobs) {
+      const builds = job.builds.slice(0, this.dataPoints);
+      const data: number[] = [];
+      const buildIds: number[] = [];
+
+      for (let build of builds) {
+        const testReportAction = build.actions.find(x => x.urlName == 'testReport');
+        if (testReportAction) {
+          data.push(testReportAction?.totalCount);
+          buildIds.push(build.number);
+        }
+      }
+
+      if (data.length) {
+        this.testsLineChartData.push({
+          title: {
+            text: job.name
+          },
+          series: [{
+            name: 'tests',
+            data: data
+          }],
+          xaxis: {
+            tickAmount: 10,
+            categories: buildIds
+          }
+        });
+      }
+    }
+  }
+
   getBuildStatus(job: JenkinsJob): string {
-    const build = job.builds[0];
+    const build = job.builds[job.builds.length - 1];
     if (build.building) {
       return 'BUILDING';
     }
     return build.result;
+  }
+
+  getLastBuildDuration(job: JenkinsJob): string {
+    const build = job.builds[job.builds.length - 1];
+
+    if (build.building) {
+      return '...';
+    }
+
+    const millis = build.duration;
+    const s = Math.trunc(millis / 1000);
+    if (s > 60) {
+      var hours = Math.floor(s / (60 * 60));
+      var divisor_for_minutes = s % (60 * 60);
+      var minutes = Math.floor(divisor_for_minutes / 60);
+      var divisor_for_seconds = divisor_for_minutes % 60;
+      var seconds = Math.ceil(divisor_for_seconds);
+      return hours + 'h ' + minutes + 'm ' + seconds + 's';
+    }
+    return s + 's';
   }
 
   changeView(view: ActiveView) {
