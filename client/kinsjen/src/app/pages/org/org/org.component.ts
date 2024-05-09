@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Subject, finalize, forkJoin, takeUntil } from 'rxjs';
+import { Subject, finalize, forkJoin, pipe, takeUntil } from 'rxjs';
 import { Location } from '@angular/common';
 import { ApexAxisChartSeries, 
   ApexTitleSubtitle, 
@@ -70,6 +70,7 @@ export class OrgComponent implements OnInit {
 
   /* pipelines */
   pipelinePage: Page<Pipeline>;
+  pipelineIdForDeletion: number = -1;
 
   /* jenkins jobs */
   jenkinsJobs: JenkinsJob[] = [];
@@ -141,6 +142,7 @@ export class OrgComponent implements OnInit {
         this.orgs = response;
         const name = this.route.snapshot.paramMap.get('org') || '';
         const org = response.content.find(x => x.name == name);
+        this.org = org!;
         if (org && org.id > 0) {
           this.findPipelines(org);
         }
@@ -323,7 +325,6 @@ export class OrgComponent implements OnInit {
       for (let i = 0; i < this.pipelinePage.totalElements; i++) {
         jobs[i].pipeline = this.pipelinePage.content[i];
       }
-      
       this.jenkinsJobs = jobs;
       this.createResultChart();
       this.createPerfChart();
@@ -433,10 +434,13 @@ export class OrgComponent implements OnInit {
     const s = Math.trunc(millis / 1000);
     if (s > 60) {
       var hours = Math.floor(s / (60 * 60));
-      var divisor_for_minutes = s % (60 * 60);
-      var minutes = Math.floor(divisor_for_minutes / 60);
-      var divisor_for_seconds = divisor_for_minutes % 60;
-      var seconds = Math.ceil(divisor_for_seconds);
+      var minDivisor = s % (60 * 60);
+      var minutes = Math.floor(minDivisor / 60);
+      var secDivisor = minDivisor % 60;
+      var seconds = Math.ceil(secDivisor);
+      if (hours == 0) {
+        return minutes + 'm ' + seconds + 's';
+      }
       return hours + 'h ' + minutes + 'm ' + seconds + 's';
     }
     return s + 's';
@@ -447,5 +451,18 @@ export class OrgComponent implements OnInit {
     const fragment = view == ActiveView.Metrics ? 'metrics' : 'listing';
     const urlTree = this.router.createUrlTree([], { fragment: fragment });
     this.location.go(urlTree.toString());
+  }
+
+  deletePipeline(pipeline: Pipeline): void {
+    this.pipelineService.delete(pipeline)
+    .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (response: any) => {
+          this.findPipelines(this.org);
+        },
+        error: (err) => {
+          this.error = this.errorService.getError(err);
+        }
+      });
   }
 }

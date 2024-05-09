@@ -78,12 +78,17 @@
     <div class="col-8 offset-2">
         <div class="row">
             <div class="col-6 mb-5" *ngFor="let job of jenkinsJobs">
-                <div class="card card-flush">
-                    <div class="card-header">
+                <div class="card">
+                    <div class="card-header border-transparent">
                         <h3 class="card-title align-items-start flex-column">
                             <a class="card-label fw-semibold text-gray-900 fs-5" [routerLink]="['pipelines', job.pipeline.id]">{{ job.name }}</a>
                             <span class="text-gray-500 mt-1 fw-semibold fs-7">{{ job._class }}</span>
                         </h3>
+                        <div class="card-toolbar">
+                            <button class="btn btn-icon btn-color-gray-500 btn-active-color-primary justify-content-end" (click)="pipelineIdForDeletion = job.pipeline.id">
+                                <i class="bi bi-trash3"></i>
+                            </button>
+                        </div>
                     </div>
                     <div class="card-body pt-5">
                         <div class="d-flex flex-stack" *ngIf="job.builds.length">
@@ -103,6 +108,15 @@
                             </div>
                             <div class="text-muted fw-semibold">
                                 <span><i class="bi bi-clock"></i> {{ getLastBuildDuration(job) }} </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-footer py-3" *ngIf="pipelineIdForDeletion == job.pipeline.id">
+                        <div class="alert alert-danger">
+                            <div class="d-flex flex-end">
+                                <div style="height: 30px; flex: auto;">Delete pipeline?</div>
+                                <button class="btn btn-light btn-sm me-2" (click)="pipelineIdForDeletion = -1">Cancel</button>
+                                <button class="btn btn-danger btn-sm" (click)="deletePipeline(job.pipeline)">Delete</button>
                             </div>
                         </div>
                     </div>
