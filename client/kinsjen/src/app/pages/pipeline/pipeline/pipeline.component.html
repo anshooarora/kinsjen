@@ -3,7 +3,13 @@
         <div class="d-flex flex-column flex-lg-row h-100">
             <div class="flex-column flex-lg-row-auto w-350px mb-10 mt-6 mb-lg-0">
                 <h3 class="mb-1">{{ jenkinsJob.fullName }}</h3>
-                <p class="text-muted">Jenkins</p>
+                <p class="text-muted">Jenkins | 
+                    <a href="javascript:void(0)" (click)="confirmForDeletion = true"><i class="bi bi-trash3 text-muted link-danger"></i></a>
+                </p>
+                <p *ngIf="confirmForDeletion">
+                    <button class="btn bg-body btn-sm me-2" (click)="confirmForDeletion = false">Cancel</button>
+                    <button class="btn btn-danger btn-sm" (click)="deletePipeline()">Delete</button>
+                </p>
 
                 <ul class="text-sm ps-0 mt-10" style="list-style: none; max-width: 250px;">
                     <li class="fw-semibold my-2 p-3 rounded" 

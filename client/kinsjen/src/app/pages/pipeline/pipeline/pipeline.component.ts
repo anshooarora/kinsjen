@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { Observable, Subject, finalize, forkJoin, takeUntil } from 'rxjs';
 import { Breadcrumb } from '../../../model/breadcrumb.model';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { BreadcrumbService } from '../../../services/breadcrumb.service';
 import { JenkinsJobsService } from '../../../services/jenkins-jobs.service';
 import { JenkinsJob } from '../../../model/jenkins-job.model';
@@ -44,9 +44,13 @@ export class PipelineComponent {
   /* state */
   loading: boolean = false;
   error: string | undefined;
+  confirmForDeletion: boolean = false;
   
   /* view */
   activeView: ActiveView = ActiveView.TestReport;
+
+  /* org */
+  org: string;
 
   /* pipeline */
   pipeline: Pipeline;
@@ -65,6 +69,7 @@ export class PipelineComponent {
   testReport: TestReport | any;
 
   constructor(private route: ActivatedRoute, 
+    private router: Router,
     private breadcrumbService: BreadcrumbService, 
     private pipelineService: PipelineService,
     private jenkinsJobsService: JenkinsJobsService,
@@ -80,6 +85,7 @@ export class PipelineComponent {
 
   setBreadcrumb(): void {
     let org = this.route.snapshot.paramMap.get('org') || "";
+    this.org = org;
     this.breadcrumbs[1].name = org;
     this.breadcrumbs[1].url = this.breadcrumbs[1].url + org;
 
@@ -195,5 +201,18 @@ export class PipelineComponent {
     const duration = childReports.map(x => x.result.duration)
       .reduce((sum, current) => sum + current);
     return Math.trunc(duration);
+  }
+
+  deletePipeline(): void {
+    this.pipelineService.delete(this.pipeline)
+    .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (response: any) => {
+          this.router.navigate(['/orgs', this.org]);
+        },
+        error: (err) => {
+          this.error = this.errorService.getError(err);
+        }
+      });
   }
 }
