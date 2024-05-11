@@ -1,11 +1,13 @@
-<div class="container" style="margin-top: -50px;">
+<div class="container" style="margin-top: -5rem;">
     <div class="row">
-        <div class="col-8 offset-2">
+        <div class="col-5">
             <div class="d-flex flex-end">
                 <a [routerLink]="['/', 'orgs']" class="btn bg-body btn-sm me-1" style="z-index:999;">Orgs <i class="bi bi-arrow-right"></i></a>
                 <a [routerLink]="['/', 'orgs', orgSelection.name]" class="btn bg-body btn-sm" style="z-index:999;"
                     *ngIf="orgSelection.id > -1">{{ orgSelection.name }} <i class="bi bi-arrow-right"></i></a>
             </div>
+
+            <!-- add pipeline panel -->
             <div class="card py-5 mt-3">
                 <div class="card-body text-center">
                     <div class="mb-5">
@@ -62,17 +64,26 @@
                 </div>
             </div>
 
-            <div class="mt-5 alert alert-danger bg-light-danger border border-danger border-dashed d-flex align-items-center p-5" 
+            <!-- error -->
+            <div class="alert alert-danger bg-light-danger border border-danger border-dashed d-flex align-items-center p-5 mt-5" *ngIf="error">
+                {{ error }}
+            </div>
+        </div>
+
+        <div class="col-7">
+            <!-- all pipelines added message -->
+            <div class="mt-14 alert alert-info bg-light-info border border-info border-dashed d-flex align-items-center p-5" 
                 *ngIf="jenkinsJobs && !jenkinsJobs.length && !error && !loading">
                 <p class="mb-0">Looks like all jobs of host <span class="fw-bold">{{ jenkinsInstanceSelection.name }}</span> have either been added or no jobs were found.</p>
             </div>
 
-            <div class="card mt-5" *ngIf="jenkinsJobs && jenkinsJobs.length">
+            <!-- pipeline list -->
+            <div class="card mt-14" *ngIf="jenkinsJobs && jenkinsJobs.length">
                 <div class="card-header align-items-center">
                     <h3 class="fw-semibold text-gray-900 m-0">Pipelines</h3>
                     <div class="card-toolbar"><span class="badge badge-primary">{{ jenkinsJobs.length }}</span></div>
                 </div>
-                <div class="card-body">
+                <div class="card-body pb-3">
                     <div class="row">
                         <div class="col-12 mb-4" *ngFor="let job of jenkinsJobs; index as i">
                             <label [ngClass]="{'btn-active-light-primary active' : job.checked, 'btn-outline-success': job.saved}" 
@@ -88,13 +99,9 @@
                         </div>
                     </div>
                 </div>
-                <div class="card-footer d-flex justify-content-end py-5 align-middle">
+                <div class="card-footer d-flex justify-content-end pt-0 mt-0 pb-8 align-middle" style="border-top: none;">
                     <button type="submit" class="btn btn-primary" (click)="save()" [disabled]="!saveBtnEnabled()">Save</button>
                 </div>
-            </div>
-
-            <div class="alert alert-danger bg-light-danger border border-danger border-dashed d-flex align-items-center p-5 mt-5" *ngIf="error">
-                {{ error }}
             </div>
         </div>
     </div>
