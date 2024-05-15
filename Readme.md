@@ -40,6 +40,14 @@ $ java -jar kinsjen.jar -Dspring.profiles.active=mysql
 $ java -jar kinsjen.jar -Dspring.profiles.active=postgres
 ```
 
+### Setup
+
+After starting the app, visit `/start` and:
+
+1. Create an org - this is where all of your pipelines can be grouped (create as many orgs as required)
+2. Connect to your Jenkins instance
+3. Start adding pipelines
+
 ### Screenshots
 
 ##### Orgs
