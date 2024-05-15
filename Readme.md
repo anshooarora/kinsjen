@@ -4,6 +4,8 @@ A small wrapper providing graphical build information and metrics for your Jenki
 
 (kins)(jen) -> (jen)(kins)
 
+kinsjen will pull live information from one or more connected Jenkins instances and build metrics for you. It will also show build logs along with `testReport` details (if available).
+
 ### Running with the build script
 
 ```
