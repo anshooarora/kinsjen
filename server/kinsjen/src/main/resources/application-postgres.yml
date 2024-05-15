@@ -1,5 +1,12 @@
 spring:
+  jpa:
+    database: POSTGRESQL
+    show-sql: true
+    hibernate:
+      ddl-auto: update
   datasource:
-    url: ${POSTGRES_URL:jdbc:postgresql://localhost/extentx}
-    username: postgres
-    password: test123
+    platform: postgres
+    url: jdbc:postgresql://localhost:5432/mydb
+    username: foo
+    password: bar
+    driverClassName: org.postgresql.Driver
