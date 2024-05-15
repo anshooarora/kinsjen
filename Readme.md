@@ -1,4 +1,4 @@
-## kinsjen
+# kinsjen
 
 A small wrapper providing graphical build information and metrics for your Jenkins jobs.
 
@@ -41,6 +41,10 @@ $ java -jar kinsjen.jar -Dspring.profiles.active=mysql
 # postgres
 $ java -jar kinsjen.jar -Dspring.profiles.active=postgres
 ```
+
+### Docker Hub
+
+Will be available soon.
 
 ### Setup
 
