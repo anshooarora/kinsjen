@@ -59,4 +59,4 @@ docker build --build-arg KINSJEN_JAR=target/kinsjen.jar -t kinsjen .
 
 echo "Launching kinsjen jar from /target/"
 cd target
-java -jar kinsjen.jar
+java -jar kinsjen.jar -Dspring.profiles.active=h2
