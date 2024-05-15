@@ -50,7 +50,6 @@ public class JenkinsJobService {
                                  final int depth,
                                  final boolean recursive) {
         final HttpHeaders headers = new HttpHeaders();
-        //headers.setBasicAuth("anshoo", "11aa31fbf6109218aefc691b1546f6ce4c");
         cred.ifPresent(value -> headers.setBasicAuth(value.getUsername(), value.getApiToken()));
         return findJobs(jenkinsInstance.getUrl(), headers, new ArrayList<>(), depth, recursive);
     }
