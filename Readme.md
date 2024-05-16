@@ -8,6 +8,8 @@ kinsjen will pull live information from one or more connected Jenkins instances 
 
 ### Running kinsjen from Docker-Compose
 
+Docker image is available at: https://hub.docker.com/r/anshooarora/kinsjen. 
+
 The recommended way to run `kinsjen` is with `docker-compose`. Currently, the supported databases are:
 
  - H2 (default)
