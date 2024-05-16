@@ -12,23 +12,29 @@ Docker image is available at: https://hub.docker.com/r/anshooarora/kinsjen.
 
 The recommended way to run `kinsjen` is with `docker-compose`. Currently, the supported databases are:
 
- - H2 (default)
+ - H2
  - MySQL
  - PostgreSQL
 
-For each database, there is a separate docker-compose.yml available at https://github.com/anshooarora/kinsjen/docker.  
+For each database, there is a separate docker-compose.yml available at https://github.com/anshooarora/kinsjen/docker. Since H2 is used here as a file database, it has minimal requirements but not recommended.
 
 ```
-# with mysql
+# h2
+docker-compose -f docker-compose-h2.yml up
+
+# mysql
 docker-compose -f docker-compose-mysql.yml up
 
-# with posgres
+# posgres
 docker-compose -f docker-compose-postgres.yml up
 ```
 
-### Running the app with sources
+### Running from sources
 
 ```
+$ git clone https://github.com/anshooarora/kinsjen.git
+$ cd kinsjen
+
 # backend with h2 database
 $ cd server/kinsjen
 $ mvn clean install
@@ -40,9 +46,9 @@ $ npm install
 $ npm start
 ```
 
-App will start on port:4200.
+App will start on `port:4200`.
 
-Alternatively, you can use MySql or Postgres, by specifying the profile:
+Alternatively, you can use MySQL or PostgreSQL, by specifying the profile:
 
 ```
 # mysql
@@ -61,12 +67,6 @@ After starting the app, visit `/start` and:
 3. Start adding pipelines
 
 ### Screenshots
-
-##### Orgs
-![Orgs](img/orgs.png)
-
-##### Pipelines
-![Pipelines](img/pipelines.png)
 
 ##### Metrics
 ![Metrics](img/metrics.png)
