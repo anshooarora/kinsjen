@@ -6,15 +6,23 @@ A small wrapper providing graphical build information and metrics for your Jenki
 
 kinsjen will pull live information from one or more connected Jenkins instances and build metrics for you. It will also show build logs along with `testReport` details (if available).
 
-### Running with the build script
+### Running kinsjen from Docker-Compose
+
+The recommended way to run `kinsjen` is with `docker-compose`. Currently, the supported databases are:
+
+ - H2 (default)
+ - MySQL
+ - PostgreSQL
+
+For each database, there is a separate docker-compose.yml available at https://github.com/anshooarora/kinsjen/docker.  
 
 ```
-$ ./build.sh
+# with mysql
+docker-compose -f docker-compose-mysql.yml up
+
+# with posgres
+docker-compose -f docker-compose-postgres.yml up
 ```
-
-App will start on port:80. 
-
-Note: the build script currently uses H2 as the default database (but can be changed to either mysql or postgres manually).
 
 ### Running the app with sources
 
@@ -41,10 +49,6 @@ $ java -jar kinsjen.jar -Dspring.profiles.active=mysql
 # postgres
 $ java -jar kinsjen.jar -Dspring.profiles.active=postgres
 ```
-
-### Docker Hub
-
-Will be available soon.
 
 ### Setup
 

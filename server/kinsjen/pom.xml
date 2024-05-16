@@ -6,7 +6,7 @@
 
     <groupId>com.aventstack</groupId>
     <artifactId>kinsjen</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>0.1</version>
     <name>kinsjen</name>
     <description>A simple test reports Jenkins wrapper</description>
 

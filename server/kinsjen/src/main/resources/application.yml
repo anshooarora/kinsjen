@@ -12,4 +12,5 @@ spring:
     allow-bean-definition-overriding: true
 logging:
   level:
+    com.aventstack: DEBUG
     org.springframework: INFO

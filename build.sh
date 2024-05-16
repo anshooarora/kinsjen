@@ -55,8 +55,8 @@ echo "Running mvn clean install"
 mvn clean install
 
 echo "Building docker image"
-docker build --build-arg KINSJEN_JAR=target/kinsjen.jar -t kinsjen .
+docker build --build-arg KINSJEN_JAR=target/kinsjen.jar -t anshooarora/kinsjen -t anshooarora/kinsjen:0.1 .
 
-echo "Launching kinsjen jar from /target/"
-cd target
-java -jar kinsjen.jar -Dspring.profiles.active=h2
+# echo "Launching kinsjen jar from /target/"
+# cd target
+# java -jar kinsjen.jar -Dspring.profiles.active=h2
