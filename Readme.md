@@ -16,7 +16,7 @@ The recommended way to run `kinsjen` is with `docker-compose`. Currently, the su
  - MySQL
  - PostgreSQL
 
-For each database, there is a separate docker-compose.yml available at https://github.com/anshooarora/kinsjen/docker. Since H2 is used here as a file database, it has minimal requirements but not recommended.
+For each database, there is a separate docker-compose.yml available at [https://github.com/anshooarora/kinsjen/docker](https://github.com/anshooarora/kinsjen/tree/main/docker). Since H2 is used here as a file database, it has minimal requirements but not recommended.
 
 ```
 # h2
