@@ -23,6 +23,5 @@ public class Build {
     private long timestamp;
     private String url;
     private String builtOn;
-    private List<Culprit> culprits;
 
 }
