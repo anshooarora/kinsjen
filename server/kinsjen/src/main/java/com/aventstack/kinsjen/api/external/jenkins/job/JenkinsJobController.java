@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.net.MalformedURLException;
+
 @RestController
 @RequestMapping("/external/jenkins/jobs")
 public class JenkinsJobController {
@@ -25,7 +27,7 @@ public class JenkinsJobController {
     public ResponseEntity<?> find(@RequestParam(defaultValue = "-1") final int jenkinsInstanceId,
             @RequestParam(defaultValue = "-1") final int credentialId,
             @RequestParam(defaultValue = "0") final int depth,
-            @RequestParam(defaultValue = "false") final boolean recursive) {
+            @RequestParam(defaultValue = "false") final boolean recursive) throws MalformedURLException {
         if (0 >= jenkinsInstanceId) {
             return ResponseEntity.badRequest().body("Invalid Jenkins instance ID specified: " + jenkinsInstanceId);
         }
